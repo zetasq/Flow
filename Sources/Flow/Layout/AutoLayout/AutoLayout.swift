@@ -8,8 +8,12 @@
 import UIKit
 
 @discardableResult
-public func AutoLayout(autoActivate: Bool = true, @AutoLayoutBuilder builder: () -> AutoLayoutStmtGroup) -> AutoLayoutStmtGroup {
+public func AutoLayout(autoActivate: Bool = true, boundDisposeContainer: AutoLayoutStmtGroupDisposeContainer? = nil, @AutoLayoutBuilder builder: () -> AutoLayoutStmtGroup) -> AutoLayoutStmtGroup {
   let group = builder()
+  
+  if let container = boundDisposeContainer {
+    container.injectNewGroup(group)
+  }
   
   if autoActivate {
     group.activate()
