@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Concrete",
+        "repositoryURL": "https://github.com/zetasq/Concrete.git",
+        "state": {
+          "branch": "master",
+          "revision": "913c7911cf9dc192a411404983e0e338c2545c98",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
