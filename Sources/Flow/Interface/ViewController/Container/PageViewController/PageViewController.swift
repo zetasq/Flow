@@ -272,11 +272,7 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
         switch oldOnboardViewController.appearanceState {
         case .initial:
           break
-        case .willAppear:
-          oldOnboardViewController.endAppearanceTransition()
-          oldOnboardViewController.beginAppearanceTransition(false, animated: false)
-          oldOnboardViewController.endAppearanceTransition()
-        case .didAppear:
+        case .willAppear, .didAppear:
           oldOnboardViewController.beginAppearanceTransition(false, animated: false)
           oldOnboardViewController.endAppearanceTransition()
         case .willDisappear:
@@ -288,132 +284,111 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
     }
     
     for (currentOnboardViewController, visibility) in newVisibilityMap {
+      let currentAppearanceState = currentOnboardViewController.appearanceState
+      
+      let newAppearanceState: ViewControllerAppearanceState
+      
       if _onboardViewControllerVisibilityMap[currentOnboardViewController] != nil {
         // Handle possibly updated appearance state
-        
-        switch currentOnboardViewController.appearanceState {
+        switch currentAppearanceState {
         case .initial, .didDisappear:
           switch visibility {
           case .hidden:
-            break
+            newAppearanceState = currentAppearanceState
           case .partial:
             switch containerAppearanceState {
             case .initial, .didDisappear:
-              break
+              newAppearanceState = currentAppearanceState
             case .willAppear, .didAppear:
-              currentOnboardViewController.beginAppearanceTransition(true, animated: true)
+              newAppearanceState = .willAppear
             case .willDisappear:
-              currentOnboardViewController.beginAppearanceTransition(true, animated: false)
-              currentOnboardViewController.endAppearanceTransition()
-              currentOnboardViewController.beginAppearanceTransition(false, animated: true)
+              newAppearanceState = .willDisappear
             }
           case .full:
             switch containerAppearanceState {
             case .initial, .didDisappear:
-              break
+              newAppearanceState = currentAppearanceState
             case .willAppear:
-              currentOnboardViewController.beginAppearanceTransition(true, animated: true)
+              newAppearanceState = .willAppear
             case .didAppear:
-              currentOnboardViewController.beginAppearanceTransition(true, animated: false)
-              currentOnboardViewController.endAppearanceTransition()
+              newAppearanceState = .didAppear
             case .willDisappear:
-              currentOnboardViewController.beginAppearanceTransition(true, animated: false)
-              currentOnboardViewController.endAppearanceTransition()
-              currentOnboardViewController.beginAppearanceTransition(false, animated: true)
+              newAppearanceState = .willDisappear
             }
           }
         case .willAppear:
           switch visibility {
           case .hidden:
-            currentOnboardViewController.endAppearanceTransition()
-            currentOnboardViewController.beginAppearanceTransition(false, animated: false)
-            currentOnboardViewController.endAppearanceTransition()
+            newAppearanceState = .didDisappear
           case .partial:
             switch containerAppearanceState {
             case .initial, .didDisappear:
-              currentOnboardViewController.endAppearanceTransition()
-              currentOnboardViewController.beginAppearanceTransition(false, animated: false)
-              currentOnboardViewController.endAppearanceTransition()
+              newAppearanceState = .didDisappear
             case .willAppear, .didAppear:
-              break
+              newAppearanceState = .willAppear
             case .willDisappear:
-              currentOnboardViewController.endAppearanceTransition()
-              currentOnboardViewController.beginAppearanceTransition(false, animated: true)
+              newAppearanceState = .willDisappear
             }
           case .full:
             switch containerAppearanceState {
             case .initial, .didDisappear:
-              currentOnboardViewController.endAppearanceTransition()
-              currentOnboardViewController.beginAppearanceTransition(false, animated: false)
-              currentOnboardViewController.endAppearanceTransition()
+              newAppearanceState = .didDisappear
             case .willAppear:
-              break
+              newAppearanceState = .willAppear
             case .didAppear:
-              currentOnboardViewController.endAppearanceTransition()
+              newAppearanceState = .didAppear
             case .willDisappear:
-              currentOnboardViewController.endAppearanceTransition()
-              currentOnboardViewController.beginAppearanceTransition(false, animated: true)
+              newAppearanceState = .willDisappear
             }
           }
         case .didAppear:
           switch visibility {
           case .hidden:
-            currentOnboardViewController.beginAppearanceTransition(false, animated: false)
-            currentOnboardViewController.endAppearanceTransition()
+            newAppearanceState = .didDisappear
           case .partial:
             switch containerAppearanceState {
             case .initial, .didDisappear:
-              currentOnboardViewController.beginAppearanceTransition(false, animated: false)
-              currentOnboardViewController.endAppearanceTransition()
+              newAppearanceState = .didDisappear
             case .willAppear:
-              currentOnboardViewController.beginAppearanceTransition(false, animated: false)
-              currentOnboardViewController.endAppearanceTransition()
-              currentOnboardViewController.beginAppearanceTransition(true, animated: true)
+              newAppearanceState = .willAppear
             case .didAppear, .willDisappear:
-              currentOnboardViewController.beginAppearanceTransition(false, animated: true)
+              newAppearanceState = .willDisappear
             }
           case .full:
             switch containerAppearanceState {
             case .initial, .didDisappear:
-              currentOnboardViewController.beginAppearanceTransition(false, animated: false)
-              currentOnboardViewController.endAppearanceTransition()
+              newAppearanceState = .didDisappear
             case .willAppear:
-              currentOnboardViewController.beginAppearanceTransition(false, animated: false)
-              currentOnboardViewController.endAppearanceTransition()
-              currentOnboardViewController.beginAppearanceTransition(true, animated: true)
+              newAppearanceState = .willAppear
             case .didAppear:
-              break
+              newAppearanceState = .didAppear
             case .willDisappear:
-              currentOnboardViewController.beginAppearanceTransition(false, animated: true)
+              newAppearanceState = .willDisappear
             }
           }
         case .willDisappear:
           switch visibility {
           case .hidden:
-            currentOnboardViewController.endAppearanceTransition()
+            newAppearanceState = .didDisappear
           case .partial:
             switch containerAppearanceState {
             case .initial, .didDisappear:
-              currentOnboardViewController.endAppearanceTransition()
+              newAppearanceState = .didDisappear
             case .willAppear:
-              currentOnboardViewController.endAppearanceTransition()
-              currentOnboardViewController.beginAppearanceTransition(true, animated: true)
+              newAppearanceState = .willAppear
             case .didAppear, .willDisappear:
-              break
+              newAppearanceState = .willDisappear
             }
           case .full:
             switch containerAppearanceState {
             case .initial, .didDisappear:
-              currentOnboardViewController.endAppearanceTransition()
+              newAppearanceState = .didDisappear
             case .willAppear:
-              currentOnboardViewController.endAppearanceTransition()
-              currentOnboardViewController.beginAppearanceTransition(true, animated: true)
+              newAppearanceState = .willAppear
             case .didAppear:
-              currentOnboardViewController.endAppearanceTransition()
-              currentOnboardViewController.beginAppearanceTransition(true, animated: false)
-              currentOnboardViewController.endAppearanceTransition()
+              newAppearanceState = .didAppear
             case .willDisappear:
-              break
+              newAppearanceState = .willDisappear
             }
           }
         }
@@ -423,33 +398,94 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
         
         switch visibility {
         case .hidden:
-          break
+          newAppearanceState = currentAppearanceState
         case .partial:
           switch containerAppearanceState {
           case .initial, .didDisappear:
-            break
+            newAppearanceState = currentAppearanceState
           case .willAppear, .didAppear:
-            currentOnboardViewController.beginAppearanceTransition(true, animated: true)
+            newAppearanceState = .willAppear
           case .willDisappear:
-            currentOnboardViewController.beginAppearanceTransition(true, animated: false)
-            currentOnboardViewController.endAppearanceTransition()
-            currentOnboardViewController.beginAppearanceTransition(false, animated: true)
+            newAppearanceState = .willDisappear
           }
         case .full:
           switch containerAppearanceState {
           case .initial, .didDisappear:
-            break
+            newAppearanceState = currentAppearanceState
           case .willAppear:
-            currentOnboardViewController.beginAppearanceTransition(true, animated: true)
+            newAppearanceState = .willAppear
           case .didAppear:
-            currentOnboardViewController.beginAppearanceTransition(true, animated: false)
-            currentOnboardViewController.endAppearanceTransition()
+            newAppearanceState = .didAppear
           case .willDisappear:
-            currentOnboardViewController.beginAppearanceTransition(true, animated: false)
-            currentOnboardViewController.endAppearanceTransition()
-            currentOnboardViewController.beginAppearanceTransition(false, animated: true)
+            newAppearanceState = .willDisappear
           }
         }
+      }
+      
+      switch (currentAppearanceState, newAppearanceState) {
+      case (.initial, .initial):
+        break
+      case (.initial, .willAppear):
+        currentOnboardViewController.beginAppearanceTransition(true, animated: true)
+      case (.initial, .didAppear):
+        currentOnboardViewController.beginAppearanceTransition(true, animated: false)
+        currentOnboardViewController.endAppearanceTransition()
+      case (.initial, .willDisappear):
+        currentOnboardViewController.beginAppearanceTransition(true, animated: false)
+        currentOnboardViewController.endAppearanceTransition()
+        currentOnboardViewController.beginAppearanceTransition(false, animated: true)
+      case (.initial, .didDisappear):
+        break
+      case (.willAppear, .initial):
+        assertionFailure()
+        currentOnboardViewController.beginAppearanceTransition(false, animated: false)
+        currentOnboardViewController.endAppearanceTransition()
+      case (.willAppear, .willAppear):
+        break
+      case (.willAppear, .didAppear):
+        currentOnboardViewController.endAppearanceTransition()
+      case (.willAppear, .willDisappear):
+        currentOnboardViewController.beginAppearanceTransition(false, animated: true)
+      case (.willAppear, .didDisappear):
+        currentOnboardViewController.beginAppearanceTransition(false, animated: false)
+        currentOnboardViewController.endAppearanceTransition()
+      case (.didAppear, .initial):
+        assertionFailure()
+        currentOnboardViewController.beginAppearanceTransition(false, animated: false)
+        currentOnboardViewController.endAppearanceTransition()
+      case (.didAppear, .willAppear):
+        assertionFailure()
+        currentOnboardViewController.beginAppearanceTransition(false, animated: true)
+      case (.didAppear, .didAppear):
+        break
+      case (.didAppear, .willDisappear):
+        currentOnboardViewController.beginAppearanceTransition(false, animated: true)
+      case (.didAppear, .didDisappear):
+        currentOnboardViewController.beginAppearanceTransition(false, animated: false)
+        currentOnboardViewController.endAppearanceTransition()
+      case (.willDisappear, .initial):
+        assertionFailure()
+        currentOnboardViewController.endAppearanceTransition()
+      case (.willDisappear, .willAppear):
+        break
+      case (.willDisappear, .didAppear):
+        currentOnboardViewController.beginAppearanceTransition(true, animated: false)
+        currentOnboardViewController.endAppearanceTransition()
+      case (.willDisappear, .willDisappear):
+        break
+      case (.willDisappear, .didDisappear):
+        currentOnboardViewController.endAppearanceTransition()
+      case (.didDisappear, .initial):
+        assertionFailure()
+      case (.didDisappear, .willAppear):
+        currentOnboardViewController.beginAppearanceTransition(true, animated: true)
+      case (.didDisappear, .didAppear):
+        currentOnboardViewController.beginAppearanceTransition(true, animated: false)
+        currentOnboardViewController.endAppearanceTransition()
+      case (.didDisappear, .willDisappear):
+        currentOnboardViewController.beginAppearanceTransition(true, animated: true)
+      case (.didDisappear, .didDisappear):
+        break
       }
     }
     
