@@ -10,17 +10,17 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_CLOSED_ENUM(NSUInteger, ViewControllerAppearState) {
-  ViewControllerAppearStateInitial = 0,
-  ViewControllerAppearStateWillAppear,
-  ViewControllerAppearStateDidAppear,
-  ViewControllerAppearStateWillDisappear,
-  ViewControllerAppearStateDidDisappear
+typedef NS_CLOSED_ENUM(NSUInteger, ViewControllerAppearanceState) {
+  ViewControllerAppearanceStateInitial = 0,
+  ViewControllerAppearanceStateWillAppear,
+  ViewControllerAppearanceStateDidAppear,
+  ViewControllerAppearanceStateWillDisappear,
+  ViewControllerAppearanceStateDidDisappear
 };
 
 @interface UIViewController (Swizzle)
 
-@property (nonatomic, assign, readonly) ViewControllerAppearState appearState;
+@property (nonatomic, assign) ViewControllerAppearanceState appearanceState;
 
 @end
 

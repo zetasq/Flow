@@ -24,42 +24,42 @@
 {
   [self _flow_swizzled_viewWillAppear:animated];
   
-  self.appearState = ViewControllerAppearStateWillAppear;
+  self.appearanceState = ViewControllerAppearanceStateWillAppear;
 }
 
 - (void)_flow_swizzled_viewDidAppear:(BOOL)animated
 {
   [self _flow_swizzled_viewDidAppear:animated];
   
-  self.appearState = ViewControllerAppearStateDidAppear;
+  self.appearanceState = ViewControllerAppearanceStateDidAppear;
 }
 
 - (void)_flow_swizzled_viewWillDisappear:(BOOL)animated
 {
   [self _flow_swizzled_viewWillDisappear:animated];
   
-  self.appearState = ViewControllerAppearStateWillDisappear;
+  self.appearanceState = ViewControllerAppearanceStateWillDisappear;
 }
 
 - (void)_flow_swizzled_viewDidDisappear:(BOOL)animated
 {
   [self _flow_swizzled_viewDidDisappear:animated];
   
-  self.appearState = ViewControllerAppearStateDidDisappear;
+  self.appearanceState = ViewControllerAppearanceStateDidDisappear;
 }
 
-- (ViewControllerAppearState)appearState
+- (ViewControllerAppearanceState)appearanceState
 {
-  let number = DynamicCast(objc_getAssociatedObject(self, @selector(appearState)), NSNumber);
-  
+  let number = (NSNumber *)objc_getAssociatedObject(self, @selector(appearanceState));
+
   return number.unsignedIntegerValue;
 }
 
-- (void)setAppearState:(ViewControllerAppearState)appearState
+- (void)setAppearanceState:(ViewControllerAppearanceState)appearanceState
 {
-  let number = @(appearState);
+  let number = @(appearanceState);
   
-  objc_setAssociatedObject(self, @selector(appearState), number, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  objc_setAssociatedObject(self, @selector(appearanceState), number, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end
