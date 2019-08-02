@@ -67,7 +67,14 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
     
     self._scrollView = UIScrollView()
     self._scrollView.isPagingEnabled = true
-    self._scrollView.alwaysBounceHorizontal = true
+    
+    switch navigationOrientation {
+    case .horizontal:
+      self._scrollView.alwaysBounceHorizontal = true
+    case .vertical:
+      self._scrollView.alwaysBounceVertical = true
+    }
+    
     self._scrollView.contentInsetAdjustmentBehavior = .never
     
     super.init(nibName: nil, bundle: nil)
@@ -97,8 +104,14 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
     
     _scrollView.frame = currentBounds
     
-    let contentSize = CGSize(width: currentBounds.width * CGFloat(_allEntries.count), height: currentBounds.height)
-    _scrollView.contentSize = contentSize
+    switch self.navigationOrientation {
+    case .horizontal:
+      let contentSize = CGSize(width: currentBounds.width * CGFloat(_allEntries.count), height: currentBounds.height)
+      _scrollView.contentSize = contentSize
+    case .vertical:
+      let contentSize = CGSize(width: currentBounds.width, height: currentBounds.height * CGFloat(_allEntries.count))
+      _scrollView.contentSize = contentSize
+    }
     
     tilePageRegardingCurrentIndex()
     updateAppearanceForPages(containerAppearanceState: self.appearanceState)
@@ -140,11 +153,19 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
   
   // MARK: - UIScrollViewDelegate
   public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    guard view.bounds.width > 0 else {
+    guard view.bounds.width > 0 && view.bounds.height > 0 else {
       return
     }
     
-    let calculatedIndex = Int((scrollView.contentOffset.x / view.bounds.width).rounded())
+    let calculatedIndex: Int
+    
+    switch self.navigationOrientation {
+    case .horizontal:
+      calculatedIndex = Int((scrollView.contentOffset.x / view.bounds.width).rounded())
+    case .vertical:
+      calculatedIndex = Int((scrollView.contentOffset.y / view.bounds.height).rounded())
+    }
+    
     if calculatedIndex != _currentIndex {
       _currentIndex = calculatedIndex
       tilePageRegardingCurrentIndex()
@@ -236,7 +257,15 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
     placeViewControllerOnboardIfNeeded(at: index)
     
     if let targetViewController = viewController(at: index) {
-      let targetFrame = CGRect(x: CGFloat(index) * view.bounds.width, y: 0, width: view.bounds.width, height: view.bounds.height)
+      let targetFrame: CGRect
+      
+      switch self.navigationOrientation {
+      case .horizontal:
+        targetFrame = CGRect(x: CGFloat(index) * view.bounds.width, y: 0, width: view.bounds.width, height: view.bounds.height)
+      case .vertical:
+        targetFrame = CGRect(x: 0, y: CGFloat(index) * view.bounds.height, width: view.bounds.width, height: view.bounds.height)
+      }
+      
       targetViewController.view.frame = targetFrame
     }
   }
