@@ -62,8 +62,6 @@ open class PageViewController: UIViewController {
     self._scrollView.contentInsetAdjustmentBehavior = .never
     
     super.init(nibName: nil, bundle: nil)
-    
-    self._scrollView.delegate = self
   }
   
   @available(*, unavailable)
@@ -76,6 +74,7 @@ open class PageViewController: UIViewController {
     super.viewDidLoad()
     
     view.addSubview(_scrollView)
+    _scrollView.delegate = self
     
     tilePageRegardingCurrentIndex()
     updateAppearanceForPages(containerAppearanceState: self.appearanceState)
