@@ -8,27 +8,14 @@
 import UIKit
 import FlowObjC
 
-open class PageViewController<ItemMetaData, ItemViewController: UIViewController>: UIViewController, UIScrollViewDelegate {
+open class PageViewController: UIViewController {
   
   // MARK: - Subtypes
-  
-  public typealias GroupType = PageViewControllerPageItemGroup<ItemMetaData, ItemViewController>
-  
   public enum NavigationOrientation {
     
     case horizontal
     
     case vertical
-    
-  }
-  
-  private enum ItemViewControllerEntry {
-    
-    case empty
-    
-    case offboard(ItemViewController)
-    
-    case onboard(ItemViewController)
     
   }
   
@@ -45,22 +32,19 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
   // MARK: - Properties
   public let navigationOrientation: NavigationOrientation
   
-  public let itemGroup: GroupType
+  private var _allPages: [UIViewController]
   
-  private var _allEntries: [ItemViewControllerEntry]
-  
-  private var _onboardViewControllerSet: Set<ItemViewController>
-  private var _onboardViewControllerVisibilityMap: [ItemViewController: OnboardViewControllerVisibility]
+  private var _onboardViewControllerSet: Set<UIViewController>
+  private var _onboardViewControllerVisibilityMap: [UIViewController: OnboardViewControllerVisibility]
   
   private var _currentIndex: Int
   
   private let _scrollView: UIScrollView
   
   // MARK: - Init & deinit
-  public init(navigationOrientation: NavigationOrientation, itemGroup: GroupType) {
+  public init(navigationOrientation: NavigationOrientation, initialViewControllers: [UIViewController]) {
     self.navigationOrientation = navigationOrientation
-    self.itemGroup = itemGroup
-    self._allEntries = itemGroup.items.map { _ in ItemViewControllerEntry.empty }
+    self._allPages = initialViewControllers
     self._onboardViewControllerSet = []
     self._onboardViewControllerVisibilityMap = [:]
     self._currentIndex = 0
@@ -106,10 +90,10 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
     
     switch self.navigationOrientation {
     case .horizontal:
-      let contentSize = CGSize(width: currentBounds.width * CGFloat(_allEntries.count), height: currentBounds.height)
+      let contentSize = CGSize(width: currentBounds.width * CGFloat(_allPages.count), height: currentBounds.height)
       _scrollView.contentSize = contentSize
     case .vertical:
-      let contentSize = CGSize(width: currentBounds.width, height: currentBounds.height * CGFloat(_allEntries.count))
+      let contentSize = CGSize(width: currentBounds.width, height: currentBounds.height * CGFloat(_allPages.count))
       _scrollView.contentSize = contentSize
     }
     
@@ -147,47 +131,17 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
   }
   
   // MARK: - Public methods
-  public var currentViewController: ItemViewController? {
+  public var currentPage: UIViewController? {
     return viewController(at: _currentIndex)
   }
   
-  // MARK: - UIScrollViewDelegate
-  public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    guard view.bounds.width > 0 && view.bounds.height > 0 else {
-      return
-    }
-    
-    let calculatedIndex: Int
-    
-    switch self.navigationOrientation {
-    case .horizontal:
-      calculatedIndex = Int((scrollView.contentOffset.x / view.bounds.width).rounded())
-    case .vertical:
-      calculatedIndex = Int((scrollView.contentOffset.y / view.bounds.height).rounded())
-    }
-    
-    if calculatedIndex != _currentIndex {
-      _currentIndex = calculatedIndex
-      tilePageRegardingCurrentIndex()
-    }
-    
-    updateAppearanceForPages(containerAppearanceState: self.appearanceState)
-  }
-  
   // MARK: - Helper methods
-  private func viewController(at index: Int) -> ItemViewController? {
+  private func viewController(at index: Int) -> UIViewController? {
     guard isIndexValid(index) else {
       return nil
     }
     
-    switch _allEntries[index] {
-    case .empty:
-      return nil
-    case .offboard(let viewController):
-      return viewController
-    case .onboard(let viewController):
-      return viewController
-    }
+    return _allPages[index]
   }
   
   private func placeViewControllerOnboardIfNeeded(at index: Int) {
@@ -195,22 +149,14 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
       return
     }
     
-    switch _allEntries[index] {
-    case .empty:
-      let viewController = itemGroup.items[index].viewControllerGenerator()
-      
-      movePageViewControllerIntoHierarchy(viewController)
-      _onboardViewControllerSet.insert(viewController)
-      
-      _allEntries[index] = .onboard(viewController)
-    case .offboard(let viewController):
-      movePageViewControllerIntoHierarchy(viewController)
-      _onboardViewControllerSet.insert(viewController)
-      
-      _allEntries[index] = .onboard(viewController)
-    case .onboard(_):
-      break
+    let viewController = _allPages[index]
+    
+    guard !_onboardViewControllerSet.contains(viewController) else {
+      return
     }
+    
+    movePageViewControllerIntoHierarchy(viewController)
+    _onboardViewControllerSet.insert(viewController)
   }
   
   private func placeViewControllerOffboardIfNeeded(at index: Int) {
@@ -218,18 +164,17 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
       return
     }
     
-    switch _allEntries[index] {
-    case .empty:
-      break
-    case .offboard(_):
-      break
-    case .onboard(let viewController):
-      movePageViewControllerOutOfHierarchy(viewController)
-      _onboardViewControllerSet.remove(viewController)
+    let viewController = _allPages[index]
+    
+    guard _onboardViewControllerSet.contains(viewController) else {
+      return
     }
+    
+    movePageViewControllerOutOfHierarchy(viewController)
+    _onboardViewControllerSet.remove(viewController)
   }
   
-  private func movePageViewControllerIntoHierarchy(_ viewController: ItemViewController) {
+  private func movePageViewControllerIntoHierarchy(_ viewController: UIViewController) {
     assert(viewController.parent == nil)
     
     addChild(viewController)
@@ -237,7 +182,7 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
     viewController.didMove(toParent: self)
   }
   
-  private func movePageViewControllerOutOfHierarchy(_ viewController: ItemViewController) {
+  private func movePageViewControllerOutOfHierarchy(_ viewController: UIViewController) {
     assert(viewController.parent == self)
     
     viewController.willMove(toParent: nil)
@@ -246,7 +191,7 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
   }
   
   private func isIndexValid(_ index: Int) -> Bool {
-    return (_allEntries.startIndex..<_allEntries.endIndex).contains(index)
+    return (_allPages.startIndex..<_allPages.endIndex).contains(index)
   }
   
   private func tilePage(at index: Int) {
@@ -277,7 +222,7 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
   }
   
   private func updateAppearanceForPages(containerAppearanceState: ViewControllerAppearanceState) {
-    var newVisibilityMap: [ItemViewController: OnboardViewControllerVisibility] = [:]
+    var newVisibilityMap: [UIViewController: OnboardViewControllerVisibility] = [:]
     
     let containerBounds = self.view.bounds
     
@@ -519,6 +464,33 @@ open class PageViewController<ItemMetaData, ItemViewController: UIViewController
     }
     
     _onboardViewControllerVisibilityMap = newVisibilityMap
+  }
+
+}
+
+// MARK: - UIScrollViewDelegate
+extension PageViewController: UIScrollViewDelegate {
+  
+  public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    guard view.bounds.width > 0 && view.bounds.height > 0 else {
+      return
+    }
+    
+    let calculatedIndex: Int
+    
+    switch self.navigationOrientation {
+    case .horizontal:
+      calculatedIndex = Int((scrollView.contentOffset.x / view.bounds.width).rounded())
+    case .vertical:
+      calculatedIndex = Int((scrollView.contentOffset.y / view.bounds.height).rounded())
+    }
+    
+    if calculatedIndex != _currentIndex {
+      _currentIndex = calculatedIndex
+      tilePageRegardingCurrentIndex()
+    }
+    
+    updateAppearanceForPages(containerAppearanceState: self.appearanceState)
   }
   
 }
