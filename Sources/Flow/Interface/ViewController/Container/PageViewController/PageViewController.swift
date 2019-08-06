@@ -32,7 +32,7 @@ open class PageViewController: UIViewController {
   // MARK: - Properties
   public let navigationOrientation: NavigationOrientation
   
-  private var _allPages: [UIViewController]
+  public private(set) var allPages: [UIViewController]
   
   private var _onboardPages: Set<UIViewController>
   private var _onboardPageVisibilityMap: [UIViewController: OnboardPageVisibility]
@@ -42,9 +42,9 @@ open class PageViewController: UIViewController {
   private let _scrollView: UIScrollView
   
   // MARK: - Init & deinit
-  public init(navigationOrientation: NavigationOrientation, initialPages: [UIViewController]) {
+  public init(navigationOrientation: NavigationOrientation) {
     self.navigationOrientation = navigationOrientation
-    self._allPages = initialPages
+    self.allPages = []
     self._onboardPages = []
     self._onboardPageVisibilityMap = [:]
     self._currentIndex = 0
@@ -89,17 +89,16 @@ open class PageViewController: UIViewController {
     
     switch self.navigationOrientation {
     case .horizontal:
-      let contentSize = CGSize(width: currentBounds.width * CGFloat(_allPages.count), height: currentBounds.height)
+      let contentSize = CGSize(width: currentBounds.width * CGFloat(allPages.count), height: currentBounds.height)
       _scrollView.contentSize = contentSize
     case .vertical:
-      let contentSize = CGSize(width: currentBounds.width, height: currentBounds.height * CGFloat(_allPages.count))
+      let contentSize = CGSize(width: currentBounds.width, height: currentBounds.height * CGFloat(allPages.count))
       _scrollView.contentSize = contentSize
     }
     
+    updateCurrentIndexIfNeeded()
     tilePagesRegardingCurrentIndex()
     performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: self.appearanceState)
-    
-    // viewDidLayoutSubviews may be called due to bounds change, so we should remove pages which are not adjacent to current index.
     cleanUpDistantPages()
   }
   
@@ -137,13 +136,42 @@ open class PageViewController: UIViewController {
     return page(at: _currentIndex)
   }
   
+  public func appendPages(_ newPages: [UIViewController]) {
+    allPages.append(contentsOf: newPages)
+    
+    if self.isViewLoaded {
+      tilePagesRegardingCurrentIndex()
+      performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: self.appearanceState)
+    }
+  }
+  
+  public func appendPage(_ newPage: UIViewController) {
+    appendPages([newPage])
+  }
+  
+  public func removePage(at index: Int) {
+    guard let pageToRemove = page(at: index) else {
+      return
+    }
+    
+    allPages.remove(at: index)
+    transitionAppearanceToDisappearForOnboardPage(pageToRemove)
+    movePageOutOfHierarchyIfPossible(pageToRemove)
+    _onboardPages.remove(pageToRemove)
+    _onboardPageVisibilityMap[pageToRemove] = nil
+    
+    tilePagesRegardingCurrentIndex()
+    performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: self.appearanceState)
+    cleanUpDistantPages()
+  }
+  
   // MARK: - Helper methods
   private func page(at index: Int) -> UIViewController? {
     guard isIndexValid(index) else {
       return nil
     }
     
-    return _allPages[index]
+    return allPages[index]
   }
   
   private func movePageIntoHierarchyIfPossible(_ page: UIViewController) {
@@ -380,8 +408,27 @@ open class PageViewController: UIViewController {
     }
   }
   
+  private func updateCurrentIndexIfNeeded() {
+    guard view.bounds.width > 0 && view.bounds.height > 0 else {
+      return
+    }
+    
+    let calculatedIndex: Int
+    
+    switch self.navigationOrientation {
+    case .horizontal:
+      calculatedIndex = Int((_scrollView.contentOffset.x / view.bounds.width).rounded())
+    case .vertical:
+      calculatedIndex = Int((_scrollView.contentOffset.y / view.bounds.height).rounded())
+    }
+    
+    if calculatedIndex != _currentIndex {
+      _currentIndex = calculatedIndex
+    }
+  }
+  
   private func isIndexValid(_ index: Int) -> Bool {
-    return (_allPages.startIndex..<_allPages.endIndex).contains(index)
+    return (allPages.startIndex..<allPages.endIndex).contains(index)
   }
   
   private func tilePage(at index: Int) {
@@ -389,7 +436,7 @@ open class PageViewController: UIViewController {
       return
     }
     
-    let page = _allPages[index]
+    let page = allPages[index]
     movePageIntoHierarchyIfPossible(page)
     _onboardPages.insert(page)
     
@@ -463,6 +510,7 @@ open class PageViewController: UIViewController {
     }
     
     for page in pagesToRemove {
+      transitionAppearanceToDisappearForOnboardPage(page)
       movePageOutOfHierarchyIfPossible(page)
       _onboardPages.remove(page)
       _onboardPageVisibilityMap[page] = nil
@@ -475,25 +523,10 @@ open class PageViewController: UIViewController {
 extension PageViewController: UIScrollViewDelegate {
   
   public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    guard view.bounds.width > 0 && view.bounds.height > 0 else {
-      return
-    }
-    
-    let calculatedIndex: Int
-    
-    switch self.navigationOrientation {
-    case .horizontal:
-      calculatedIndex = Int((scrollView.contentOffset.x / view.bounds.width).rounded())
-    case .vertical:
-      calculatedIndex = Int((scrollView.contentOffset.y / view.bounds.height).rounded())
-    }
-    
-    if calculatedIndex != _currentIndex {
-      _currentIndex = calculatedIndex
-      tilePagesRegardingCurrentIndex()
-    }
-    
+    updateCurrentIndexIfNeeded()
+    tilePagesRegardingCurrentIndex()
     performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: self.appearanceState)
+    cleanUpDistantPages()
   }
   
 }
