@@ -24,11 +24,11 @@ extension UIViewController {
   private static var pageItemKey = "pageItemKey"
   
   public final var pageItem: PageItem {
-    if let existingItem = objc_getAssociatedObject(self, &UIViewController.pageItemKey) as? PageItem {
+    if let existingItem = objc_getAssociatedObject(self, &Self.pageItemKey) as? PageItem {
       return existingItem
     } else {
       let newItem = PageItem()
-      objc_setAssociatedObject(self, &UIViewController.pageItemKey, newItem, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+      objc_setAssociatedObject(self, &Self.pageItemKey, newItem, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
       return newItem
     }
   }
