@@ -30,7 +30,7 @@ open class PageViewController: UIViewController {
   }
   
   // MARK: - Properties
-  public let navigationOrientation: NavigationOrientation
+  private let _contentLayouter: PageViewControllerContentLayouting
   
   public private(set) var allPages: [UIViewController]
   
@@ -39,25 +39,24 @@ open class PageViewController: UIViewController {
   
   private var _currentIndex: Int
   
+  private var _currentIndexBeforeViewLayout: Int
+  
   private let _scrollView: UIScrollView
   
   // MARK: - Init & deinit
-  public init(navigationOrientation: NavigationOrientation) {
-    self.navigationOrientation = navigationOrientation
+  public init(contentLayouter: PageViewControllerContentLayouting = HorizontalPagingLayouter()) {
+    self._contentLayouter = contentLayouter
     self.allPages = []
     self._onboardPages = []
     self._onboardPageVisibilityMap = [:]
     self._currentIndex = 0
+    self._currentIndexBeforeViewLayout = 0
     
     self._scrollView = UIScrollView()
     self._scrollView.isPagingEnabled = true
     
-    switch navigationOrientation {
-    case .horizontal:
-      self._scrollView.alwaysBounceHorizontal = true
-    case .vertical:
-      self._scrollView.alwaysBounceVertical = true
-    }
+    self._scrollView.alwaysBounceHorizontal = contentLayouter.shouldScrollViewAlwaysBounceHorizontal
+    self._scrollView.alwaysBounceVertical = contentLayouter.shouldScrollViewAlwaysBounceVertical
     
     self._scrollView.contentInsetAdjustmentBehavior = .never
     
@@ -73,28 +72,33 @@ open class PageViewController: UIViewController {
   open override func viewDidLoad() {
     super.viewDidLoad()
     
+    _scrollView.frame = view.bounds
+    _scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    
     view.addSubview(_scrollView)
     _scrollView.delegate = self
     
+    updateBouncingBehavior()
+    
+    updateCurrentIndexIfNeeded()
     tilePagesRegardingCurrentIndex()
     performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: self.appearanceState)
+  }
+  
+  open override func viewWillLayoutSubviews() {
+    super.viewWillLayoutSubviews()
+    
+    // We should keep the same index after view.bounds changes. e.g. If the user are watching a series of videos, it is an unexpected behavior that currrent video changes after screen rotation.
+    // But if the scrollView is still decelerating when the device is rotated, the index will be incorrect nonetheless.
+    self._currentIndexBeforeViewLayout = self._currentIndex
   }
   
   open override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
     
-    let currentBounds = view.bounds
+    self.setCurrentIndex(_currentIndexBeforeViewLayout, animated: false)
     
-    _scrollView.frame = currentBounds
-    
-    switch self.navigationOrientation {
-    case .horizontal:
-      let contentSize = CGSize(width: currentBounds.width * CGFloat(allPages.count), height: currentBounds.height)
-      _scrollView.contentSize = contentSize
-    case .vertical:
-      let contentSize = CGSize(width: currentBounds.width, height: currentBounds.height * CGFloat(allPages.count))
-      _scrollView.contentSize = contentSize
-    }
+    updateContentSize()
     
     updateCurrentIndexIfNeeded()
     tilePagesRegardingCurrentIndex()
@@ -163,6 +167,15 @@ open class PageViewController: UIViewController {
     tilePagesRegardingCurrentIndex()
     performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: self.appearanceState)
     cleanUpDistantPages()
+  }
+  
+  func setCurrentIndex(_ newCurrentIndex: Int, animated: Bool) {
+    guard isIndexValid(newCurrentIndex) else {
+      return
+    }
+    
+    let targetContentOffset = self._contentLayouter.calculatePreferredContentOffset(forDisplayingPageAt: newCurrentIndex, containerBounds: view.bounds)
+    self._scrollView.setContentOffset(targetContentOffset, animated: animated)
   }
   
   // MARK: - Helper methods
@@ -408,19 +421,23 @@ open class PageViewController: UIViewController {
     }
   }
   
+  private func updateContentSize() {
+    assert(isViewLoaded)
+    
+    _scrollView.contentSize = self._contentLayouter.calculateCanvasSize(containerBounds: view.bounds, pagesCount: allPages.count)
+  }
+  
+  private func updateBouncingBehavior() {
+    self._scrollView.alwaysBounceHorizontal = self._contentLayouter.shouldScrollViewAlwaysBounceHorizontal
+    self._scrollView.alwaysBounceVertical = self._contentLayouter.shouldScrollViewAlwaysBounceVertical
+  }
+  
   private func updateCurrentIndexIfNeeded() {
     guard view.bounds.width > 0 && view.bounds.height > 0 else {
       return
     }
     
-    let calculatedIndex: Int
-    
-    switch self.navigationOrientation {
-    case .horizontal:
-      calculatedIndex = Int((_scrollView.contentOffset.x / view.bounds.width).rounded())
-    case .vertical:
-      calculatedIndex = Int((_scrollView.contentOffset.y / view.bounds.height).rounded())
-    }
+    let calculatedIndex = self._contentLayouter.calculateCurrentIndex(containerBounds: view.bounds, contentOffset: _scrollView.contentOffset)
     
     if calculatedIndex != _currentIndex {
       _currentIndex = calculatedIndex
@@ -440,16 +457,7 @@ open class PageViewController: UIViewController {
     movePageIntoHierarchyIfPossible(page)
     _onboardPages.insert(page)
     
-    let targetFrame: CGRect
-    
-    switch self.navigationOrientation {
-    case .horizontal:
-      targetFrame = CGRect(x: CGFloat(index) * view.bounds.width, y: 0, width: view.bounds.width, height: view.bounds.height)
-    case .vertical:
-      targetFrame = CGRect(x: 0, y: CGFloat(index) * view.bounds.height, width: view.bounds.width, height: view.bounds.height)
-    }
-    
-    page.view.frame = targetFrame
+    page.view.frame = self._contentLayouter.calculatePageFrame(at: index, containerBounds: view.bounds)
   }
 
   private func tilePagesRegardingCurrentIndex() {
