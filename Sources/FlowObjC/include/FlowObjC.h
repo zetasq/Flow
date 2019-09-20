@@ -6,3 +6,4 @@
 //
 
 #import "../UIViewController+Swizzle.h"
+#import "../MotionBlurFilter.h"
