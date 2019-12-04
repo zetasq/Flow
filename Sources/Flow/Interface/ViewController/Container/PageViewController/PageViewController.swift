@@ -6,19 +6,10 @@
 //
 
 import UIKit
-import FlowObjC
 
 open class PageViewController: UIViewController {
   
   // MARK: - Subtypes
-  public enum NavigationOrientation {
-    
-    case horizontal
-    
-    case vertical
-    
-  }
-  
   private enum OnboardPageVisibility {
     
     case hidden
@@ -65,7 +56,7 @@ open class PageViewController: UIViewController {
   
   @available(*, unavailable)
   public required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    fatalError("\(#function) has not been implemented")
   }
   
   // MARK: - View life cycle
@@ -82,14 +73,14 @@ open class PageViewController: UIViewController {
     
     updateCurrentIndexIfNeeded()
     tilePagesRegardingCurrentIndex()
-    performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: self.appearanceState)
+    performAppearStateUpdateAfterPossibleTiling()
   }
   
   open override func viewWillLayoutSubviews() {
     super.viewWillLayoutSubviews()
     
     // We should keep the same index after view.bounds changes. e.g. If the user are watching a series of videos, it is an unexpected behavior that currrent video changes after screen rotation.
-    // But if the scrollView is still decelerating when the device is rotated, the index will be incorrect nonetheless.
+    // But if the scrollView is still decelerating when the device is being rotated, the index will be incorrect nonetheless.
     self._currentIndexBeforeViewLayout = self._currentIndex
   }
   
@@ -102,32 +93,32 @@ open class PageViewController: UIViewController {
     
     updateCurrentIndexIfNeeded()
     tilePagesRegardingCurrentIndex()
-    performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: self.appearanceState)
+    performAppearStateUpdateAfterPossibleTiling()
     cleanUpDistantPages()
   }
   
   open override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
-    performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: .willAppear)
+    performAppearStateUpdateAfterPossibleTiling()
   }
   
   open override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
-    performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: .didAppear)
+    performAppearStateUpdateAfterPossibleTiling()
   }
   
   open override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     
-    performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: .willDisappear)
+    performAppearStateUpdateAfterPossibleTiling()
   }
   
   open override func viewDidDisappear(_ animated: Bool) {
     super.viewDidDisappear(animated)
     
-    performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: .didDisappear)
+    performAppearStateUpdateAfterPossibleTiling()
   }
   
   // MARK: - Appearance Overrides
@@ -145,7 +136,7 @@ open class PageViewController: UIViewController {
     
     if self.isViewLoaded {
       tilePagesRegardingCurrentIndex()
-      performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: self.appearanceState)
+      performAppearStateUpdateAfterPossibleTiling()
     }
   }
   
@@ -159,13 +150,13 @@ open class PageViewController: UIViewController {
     }
     
     allPages.remove(at: index)
-    transitionAppearanceToDisappearForOnboardPage(pageToRemove)
+    transitionAppearStateToDidDisappearForOnboardPage(pageToRemove)
     movePageOutOfHierarchyIfPossible(pageToRemove)
     _onboardPages.remove(pageToRemove)
     _onboardPageVisibilityMap[pageToRemove] = nil
     
     tilePagesRegardingCurrentIndex()
-    performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: self.appearanceState)
+    performAppearStateUpdateAfterPossibleTiling()
     cleanUpDistantPages()
   }
   
@@ -224,140 +215,123 @@ open class PageViewController: UIViewController {
     }
   }
 
-  private func calculateTargetAppearanceStateForOnboardPage(_ onboardPage: UIViewController, pageVisibility: OnboardPageVisibility, containerAppearanceState: ViewControllerAppearanceState) -> ViewControllerAppearanceState {
-    let currentAppearanceState = onboardPage.appearanceState
+  private func calculateTargetAppearStateForOnboardPage(_ onboardPage: UIViewController, pageVisibility: OnboardPageVisibility, containerAppearState: UIViewController.AppearState) -> UIViewController.AppearState {
+    let currentAppearState = onboardPage.appearState
     
-    let newAppearanceState: ViewControllerAppearanceState
+    let newAppearState: UIViewController.AppearState
     
-    switch currentAppearanceState {
-    case .initial, .didDisappear:
+    switch currentAppearState {
+    case .didDisappear:
       switch pageVisibility {
       case .hidden:
-        newAppearanceState = currentAppearanceState
+        newAppearState = .didDisappear
       case .partial:
-        switch containerAppearanceState {
-        case .initial, .didDisappear:
-          newAppearanceState = currentAppearanceState
+        switch containerAppearState {
+        case .didDisappear:
+          newAppearState = .didDisappear
         case .willAppear, .didAppear:
-          newAppearanceState = .willAppear
+          newAppearState = .willAppear
         case .willDisappear:
-          newAppearanceState = .willDisappear
+          newAppearState = .willDisappear
         }
       case .full:
-        switch containerAppearanceState {
-        case .initial, .didDisappear:
-          newAppearanceState = currentAppearanceState
+        switch containerAppearState {
+        case .didDisappear:
+          newAppearState = .didDisappear
         case .willAppear:
-          newAppearanceState = .willAppear
+          newAppearState = .willAppear
         case .didAppear:
-          newAppearanceState = .didAppear
+          newAppearState = .didAppear
         case .willDisappear:
-          newAppearanceState = .willDisappear
+          newAppearState = .willDisappear
         }
       }
     case .willAppear:
       switch pageVisibility {
       case .hidden:
-        newAppearanceState = .didDisappear
+        newAppearState = .didDisappear
       case .partial:
-        switch containerAppearanceState {
-        case .initial, .didDisappear:
-          newAppearanceState = .didDisappear
+        switch containerAppearState {
+        case .didDisappear:
+          newAppearState = .didDisappear
         case .willAppear, .didAppear:
-          newAppearanceState = .willAppear
+          newAppearState = .willAppear
         case .willDisappear:
-          newAppearanceState = .willDisappear
+          newAppearState = .willDisappear
         }
       case .full:
-        switch containerAppearanceState {
-        case .initial, .didDisappear:
-          newAppearanceState = .didDisappear
+        switch containerAppearState {
+        case .didDisappear:
+          newAppearState = .didDisappear
         case .willAppear:
-          newAppearanceState = .willAppear
+          newAppearState = .willAppear
         case .didAppear:
-          newAppearanceState = .didAppear
+          newAppearState = .didAppear
         case .willDisappear:
-          newAppearanceState = .willDisappear
+          newAppearState = .willDisappear
         }
       }
     case .didAppear:
       switch pageVisibility {
       case .hidden:
-        newAppearanceState = .didDisappear
+        newAppearState = .didDisappear
       case .partial:
-        switch containerAppearanceState {
-        case .initial, .didDisappear:
-          newAppearanceState = .didDisappear
+        switch containerAppearState {
+        case .didDisappear:
+          newAppearState = .didDisappear
         case .willAppear:
-          newAppearanceState = .willAppear
+          newAppearState = .willAppear
         case .didAppear, .willDisappear:
-          newAppearanceState = .willDisappear
+          newAppearState = .willDisappear
         }
       case .full:
-        switch containerAppearanceState {
-        case .initial, .didDisappear:
-          newAppearanceState = .didDisappear
+        switch containerAppearState {
+        case .didDisappear:
+          newAppearState = .didDisappear
         case .willAppear:
-          newAppearanceState = .willAppear
+          newAppearState = .willAppear
         case .didAppear:
-          newAppearanceState = .didAppear
+          newAppearState = .didAppear
         case .willDisappear:
-          newAppearanceState = .willDisappear
+          newAppearState = .willDisappear
         }
       }
     case .willDisappear:
       switch pageVisibility {
       case .hidden:
-        newAppearanceState = .didDisappear
+        newAppearState = .didDisappear
       case .partial:
-        switch containerAppearanceState {
-        case .initial, .didDisappear:
-          newAppearanceState = .didDisappear
+        switch containerAppearState {
+        case .didDisappear:
+          newAppearState = .didDisappear
         case .willAppear:
-          newAppearanceState = .willAppear
+          newAppearState = .willAppear
         case .didAppear, .willDisappear:
-          newAppearanceState = .willDisappear
+          newAppearState = .willDisappear
         }
       case .full:
-        switch containerAppearanceState {
-        case .initial, .didDisappear:
-          newAppearanceState = .didDisappear
+        switch containerAppearState {
+        case .didDisappear:
+          newAppearState = .didDisappear
         case .willAppear:
-          newAppearanceState = .willAppear
+          newAppearState = .willAppear
         case .didAppear:
-          newAppearanceState = .didAppear
+          newAppearState = .didAppear
         case .willDisappear:
-          newAppearanceState = .willDisappear
+          newAppearState = .willDisappear
         }
       }
     }
     
-    return newAppearanceState
+    return newAppearState
   }
   
-  private func transitionAppearanceToTargetStateForOnboardPage(_ onboardPage: UIViewController, targetAppearanceState: ViewControllerAppearanceState) {
+  private func transitionAppearStateToTargetStateForOnboardPage(_ onboardPage: UIViewController, targetAppearState: UIViewController.AppearState) {
     assert(onboardPage.parent == self)
     
-    let currentAppearanceState = onboardPage.appearanceState
+    let currentAppearState = onboardPage.appearState
     
-    switch (currentAppearanceState, targetAppearanceState) {
-    case (.initial, .initial):
-      break
-    case (.initial, .willAppear):
-      onboardPage.beginAppearanceTransition(true, animated: true)
-    case (.initial, .didAppear):
-      onboardPage.beginAppearanceTransition(true, animated: false)
-      onboardPage.endAppearanceTransition()
-    case (.initial, .willDisappear):
-      onboardPage.beginAppearanceTransition(true, animated: false)
-      onboardPage.endAppearanceTransition()
-      onboardPage.beginAppearanceTransition(false, animated: true)
-    case (.initial, .didDisappear):
-      break
-    case (.willAppear, .initial):
-      assertionFailure()
-      onboardPage.beginAppearanceTransition(false, animated: false)
-      onboardPage.endAppearanceTransition()
+    switch (currentAppearState, targetAppearState) {
     case (.willAppear, .willAppear):
       break
     case (.willAppear, .didAppear):
@@ -365,10 +339,6 @@ open class PageViewController: UIViewController {
     case (.willAppear, .willDisappear):
       onboardPage.beginAppearanceTransition(false, animated: true)
     case (.willAppear, .didDisappear):
-      onboardPage.beginAppearanceTransition(false, animated: false)
-      onboardPage.endAppearanceTransition()
-    case (.didAppear, .initial):
-      assertionFailure()
       onboardPage.beginAppearanceTransition(false, animated: false)
       onboardPage.endAppearanceTransition()
     case (.didAppear, .willAppear):
@@ -381,9 +351,6 @@ open class PageViewController: UIViewController {
     case (.didAppear, .didDisappear):
       onboardPage.beginAppearanceTransition(false, animated: false)
       onboardPage.endAppearanceTransition()
-    case (.willDisappear, .initial):
-      assertionFailure()
-      onboardPage.endAppearanceTransition()
     case (.willDisappear, .willAppear):
       break
     case (.willDisappear, .didAppear):
@@ -393,8 +360,6 @@ open class PageViewController: UIViewController {
       break
     case (.willDisappear, .didDisappear):
       onboardPage.endAppearanceTransition()
-    case (.didDisappear, .initial):
-      assertionFailure()
     case (.didDisappear, .willAppear):
       onboardPage.beginAppearanceTransition(true, animated: true)
     case (.didDisappear, .didAppear):
@@ -407,11 +372,11 @@ open class PageViewController: UIViewController {
     }
   }
   
-  private func transitionAppearanceToDisappearForOnboardPage(_ onboardPage: UIViewController) {
+  private func transitionAppearStateToDidDisappearForOnboardPage(_ onboardPage: UIViewController) {
     assert(onboardPage.parent == self)
     
-    switch onboardPage.appearanceState {
-    case .initial, .didDisappear:
+    switch onboardPage.appearState {
+    case .didDisappear:
       break
     case .willAppear, .didAppear:
       onboardPage.beginAppearanceTransition(false, animated: false)
@@ -466,7 +431,7 @@ open class PageViewController: UIViewController {
     tilePage(at: _currentIndex + 1)
   }
   
-  private func performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: ViewControllerAppearanceState) {
+  private func performAppearStateUpdateAfterPossibleTiling() {
     var newVisibilityMap: [UIViewController: OnboardPageVisibility] = [:]
     
     for onboardViewController in _onboardPages {
@@ -474,21 +439,21 @@ open class PageViewController: UIViewController {
     }
     
     // This method is only called after possible tiling, so there should only be new onboard view controllers.
-    #if DEBUG
     assert(Set(newVisibilityMap.keys).isSuperset(of: Set(_onboardPageVisibilityMap.keys)))
-    #endif
     
-    var viewControllerTargetAppearanceStatePairs: [(UIViewController, ViewControllerAppearanceState)] = []
+    var viewControllerTargetAppearStatePairs: [(UIViewController, UIViewController.AppearState)] = []
+    
+    let containerAppearState = self.appearState
     
     for (viewController, visibility) in newVisibilityMap {
-      let targetAppearanceState = calculateTargetAppearanceStateForOnboardPage(viewController, pageVisibility: visibility, containerAppearanceState: containerAppearanceState)
+      let targetAppearState = calculateTargetAppearStateForOnboardPage(viewController, pageVisibility: visibility, containerAppearState: containerAppearState)
       
-      viewControllerTargetAppearanceStatePairs.append((viewController, targetAppearanceState))
+      viewControllerTargetAppearStatePairs.append((viewController, targetAppearState))
     }
     
-    // We want willDisappear/didDisappear to be called first, so some critical resource may be released and acquired properly.
-    for (viewController, targetAppearanceState) in viewControllerTargetAppearanceStatePairs.sorted(by: { $0.1.orderForViewControllerTransitioning < $1.1.orderForViewControllerTransitioning }) {
-      transitionAppearanceToTargetStateForOnboardPage(viewController, targetAppearanceState: targetAppearanceState)
+    // We want willDisappear/didDisappear to be called first, so some critical resource may be released and then be acquired.
+    for (viewController, targetAppearState) in viewControllerTargetAppearStatePairs.sorted(by: { $0.1.orderForViewControllerTransitioning < $1.1.orderForViewControllerTransitioning }) {
+      transitionAppearStateToTargetStateForOnboardPage(viewController, targetAppearState: targetAppearState)
     }
     
     _onboardPageVisibilityMap = newVisibilityMap
@@ -518,7 +483,7 @@ open class PageViewController: UIViewController {
     }
     
     for page in pagesToRemove {
-      transitionAppearanceToDisappearForOnboardPage(page)
+      transitionAppearStateToDidDisappearForOnboardPage(page)
       movePageOutOfHierarchyIfPossible(page)
       _onboardPages.remove(page)
       _onboardPageVisibilityMap[page] = nil
@@ -533,7 +498,7 @@ extension PageViewController: UIScrollViewDelegate {
   public func scrollViewDidScroll(_ scrollView: UIScrollView) {
     updateCurrentIndexIfNeeded()
     tilePagesRegardingCurrentIndex()
-    performAppearanceUpdateAfterPossibleTiling(containerAppearanceState: self.appearanceState)
+    performAppearStateUpdateAfterPossibleTiling()
     cleanUpDistantPages()
   }
   
