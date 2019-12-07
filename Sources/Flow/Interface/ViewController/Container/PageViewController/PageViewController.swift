@@ -23,7 +23,13 @@ open class PageViewController: UIViewController {
   // MARK: - Properties
   private let _contentLayouter: PageViewControllerContentLayouting
   
-  public private(set) var allPages: [UIViewController]
+  public private(set) var allPages: [UIViewController] {
+    didSet {
+      if isViewLoaded {
+        updateContentSize()
+      }
+    }
+  }
   
   private var _onboardPages: Set<UIViewController>
   private var _onboardPageVisibilityMap: [UIViewController: OnboardPageVisibility]
