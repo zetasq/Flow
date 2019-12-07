@@ -10,7 +10,7 @@ let package = Package(
   products: [
     .library(
       name: "Flow",
-      targets: ["Flow"]
+      targets: ["FlowObjC", "Flow"]
     ),
   ],
   dependencies: [
@@ -18,12 +18,16 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "Flow",
+      name: "FlowObjC",
       dependencies: ["Concrete"]
+    ),
+    .target(
+      name: "Flow",
+      dependencies: ["FlowObjC", "Concrete"]
     ),
     .testTarget(
       name: "FlowTests",
-      dependencies: ["Flow"]
+      dependencies: ["FlowObjC", "Flow"]
     ),
   ]
 )
