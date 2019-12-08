@@ -34,7 +34,10 @@ private var boundScopeTableKey = "boundScopeTableKey"
 
 extension Stylable {
   
-  public func withStyleScope(named scopeName: String, _ block: (_ scope: StyleScope) -> Void) {
+  public func withStyleScope(named scopeName: String, @StyleRulesBuilder _ block: () -> [AbstractStyleRule]) {
+    // There is no + (void)load method in Swift, so we use the once token pattern here to do the logic injection into UIKit.
+    _ = UIKitStyleAutomationOnceToken
+    
     let scopeTable: _StyleScopeTable
     
     if let existingTable = objc_getAssociatedObject(self, &boundScopeTableKey) as? _StyleScopeTable {
@@ -45,7 +48,11 @@ extension Stylable {
       scopeTable = newTable
     }
     
-    scopeTable.withScope(named: scopeName, block)
+    scopeTable.withScope(named: scopeName) { (scope) in
+      scope.removeAllRules()
+      let rules = block()
+      scope.addRules(rules)
+    }
     
     if self.needsApplyStyleRulesRecursivelyImmediatelyForRulesChange {
       self.applyStyleRulesRecursively()

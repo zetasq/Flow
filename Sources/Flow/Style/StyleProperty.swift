@@ -9,6 +9,10 @@ import Foundation
 
 public class PartialStyleProperty<StylableElement> {
   
+  public var partialPropertyKeyPath: PartialKeyPath<StylableElement> {
+    fatalError("\(#function) should be implemented by subclass")
+  }
+  
   public func apply(to element: StylableElement) {
     fatalError("\(#function) should be implemented by subclass")
   }
@@ -24,6 +28,10 @@ public final class StyleProperty<StylableElement, Value>: PartialStyleProperty<S
   public init(propertyKeyPath: ReferenceWritableKeyPath<StylableElement, Value>, propertyValue: Value) {
     self.propertyKeyPath = propertyKeyPath
     self.propertyValue = propertyValue
+  }
+  
+  public override var partialPropertyKeyPath: PartialKeyPath<StylableElement> {
+    return propertyKeyPath
   }
   
   public override func apply(to element: StylableElement) {
