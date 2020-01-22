@@ -69,9 +69,7 @@ open class PageViewController: UIViewController {
   open override func viewDidLoad() {
     super.viewDidLoad()
     
-    _scrollView.frame = view.bounds
-    _scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-    
+    _scrollView.frame = view.bounds // We will still update scrollView's frame in viewDidLayoutSubviews
     view.addSubview(_scrollView)
     _scrollView.delegate = self
     
@@ -92,6 +90,8 @@ open class PageViewController: UIViewController {
   
   open override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
+    
+    _scrollView.frame = view.bounds // We cannot rely on UIView's auto-resizing layout algorithm, due to its sub-pixel dimension issues.
     
     self.setCurrentIndex(_currentIndexBeforeViewLayout, animated: false)
     
