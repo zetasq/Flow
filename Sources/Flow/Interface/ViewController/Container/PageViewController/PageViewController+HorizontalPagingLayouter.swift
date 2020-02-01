@@ -22,20 +22,20 @@ extension PageViewController {
       return false
     }
     
-    public func calculateCanvasSize(containerBounds: CGRect, pagesCount: Int) -> CGSize {
-      return CGSize(width: containerBounds.width * CGFloat(pagesCount), height: containerBounds.height)
+    public func calculateCanvasSize(containerSize: CGSize, pagesCount: Int) -> CGSize {
+      return CGSize(width: containerSize.width * CGFloat(pagesCount), height: containerSize.height)
     }
     
-    public func calculateCurrentIndex(containerBounds: CGRect, contentOffset: CGPoint) -> Int {
-      return Int((contentOffset.x / containerBounds.width).rounded())
+    public func calculateCurrentIndex(containerSize: CGSize, contentOffset: CGPoint) -> Int {
+      return Int((contentOffset.x / containerSize.width).rounded())
     }
     
-    public func calculatePageFrame(at index: Int, containerBounds: CGRect) -> CGRect {
-      return CGRect(x: CGFloat(index) * containerBounds.width, y: 0, width: containerBounds.width, height: containerBounds.height)
+    public func calculatePageFrame(at index: Int, containerSize: CGSize) -> CGRect {
+      return CGRect(x: CGFloat(index) * containerSize.width, y: 0, width: containerSize.width, height: containerSize.height)
     }
 
-    public func calculatePreferredContentOffset(forDisplayingPageAt index: Int, containerBounds: CGRect) -> CGPoint {
-      let pageFrame = self.calculatePageFrame(at: index, containerBounds: containerBounds)
+    public func calculatePreferredContentOffset(forDisplayingPageAt index: Int, containerSize: CGSize) -> CGPoint {
+      let pageFrame = self.calculatePageFrame(at: index, containerSize: containerSize)
       
       return pageFrame.origin
     }

@@ -14,13 +14,13 @@ public protocol PageViewControllerContentLayouting {
   
   var shouldScrollViewAlwaysBounceVertical: Bool { get }
   
-  func calculateCanvasSize(containerBounds: CGRect, pagesCount: Int) -> CGSize
+  func calculateCanvasSize(containerSize: CGSize, pagesCount: Int) -> CGSize
 
-  func calculateCurrentIndex(containerBounds: CGRect, contentOffset: CGPoint) -> Int
+  func calculateCurrentIndex(containerSize: CGSize, contentOffset: CGPoint) -> Int
   
-  func calculatePageFrame(at index: Int, containerBounds: CGRect) -> CGRect
+  func calculatePageFrame(at index: Int, containerSize: CGSize) -> CGRect
   
-  func calculatePreferredContentOffset(forDisplayingPageAt index: Int, containerBounds: CGRect) -> CGPoint
+  func calculatePreferredContentOffset(forDisplayingPageAt index: Int, containerSize: CGSize) -> CGPoint
   
 }
 

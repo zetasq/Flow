@@ -171,7 +171,7 @@ open class PageViewController: UIViewController {
       return
     }
     
-    let targetContentOffset = self._contentLayouter.calculatePreferredContentOffset(forDisplayingPageAt: newCurrentIndex, containerBounds: view.bounds)
+    let targetContentOffset = self._contentLayouter.calculatePreferredContentOffset(forDisplayingPageAt: newCurrentIndex, containerSize: _scrollView.bounds.size)
     self._scrollView.setContentOffset(targetContentOffset, animated: animated)
   }
   
@@ -395,7 +395,7 @@ open class PageViewController: UIViewController {
   private func updateContentSize() {
     assert(isViewLoaded)
     
-    _scrollView.contentSize = self._contentLayouter.calculateCanvasSize(containerBounds: view.bounds, pagesCount: allPages.count)
+    _scrollView.contentSize = self._contentLayouter.calculateCanvasSize(containerSize: _scrollView.bounds.size, pagesCount: allPages.count)
   }
   
   private func updateBouncingBehavior() {
@@ -408,7 +408,7 @@ open class PageViewController: UIViewController {
       return
     }
     
-    let calculatedIndex = self._contentLayouter.calculateCurrentIndex(containerBounds: view.bounds, contentOffset: _scrollView.contentOffset)
+    let calculatedIndex = self._contentLayouter.calculateCurrentIndex(containerSize: _scrollView.bounds.size, contentOffset: _scrollView.contentOffset)
     
     if calculatedIndex != _currentIndex {
       _currentIndex = calculatedIndex
@@ -428,7 +428,7 @@ open class PageViewController: UIViewController {
     movePageIntoHierarchyIfPossible(page)
     _onboardPages.insert(page)
     
-    page.view.frame = self._contentLayouter.calculatePageFrame(at: index, containerBounds: view.bounds)
+    page.view.frame = self._contentLayouter.calculatePageFrame(at: index, containerSize: _scrollView.bounds.size)
   }
 
   private func tilePagesRegardingCurrentIndex() {
