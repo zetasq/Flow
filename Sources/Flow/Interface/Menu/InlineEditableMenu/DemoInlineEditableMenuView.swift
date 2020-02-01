@@ -8,6 +8,8 @@
 import Foundation
 import UIKit
 
+#if DEBUG
+
 @objc
 private protocol DemoInlineEditableMenuViewEditActions {
   
@@ -145,3 +147,5 @@ extension DemoInlineEditableMenuView: DemoInlineEditableMenuViewEditActions {
   }
   
 }
+
+#endif
