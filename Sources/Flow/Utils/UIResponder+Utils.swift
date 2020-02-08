@@ -10,7 +10,7 @@ import UIKit
 
 extension UIResponder {
   
-  public func searchResponderChain<T>(ofType type: T.Type) -> T? {
+  public final func searchResponderChain<T>(ofType type: T.Type) -> T? {
     var searchingResponder: UIResponder? = self
     
     while let currentResponder = searchingResponder {
@@ -22,6 +22,19 @@ extension UIResponder {
     }
     
     return nil
+  }
+  
+  public final func responderChain() -> [UIResponder] {
+    var chain: [UIResponder] = []
+    
+    var traveller: UIResponder? = self
+    
+    while let responder = traveller {
+      chain.append(responder)
+      traveller = traveller?.next
+    }
+    
+    return chain
   }
   
 }
