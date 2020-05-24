@@ -37,3 +37,20 @@ static NSMutableArray<void (^)(UIView *)> *sViewDidMoveToWindowHandlers;
 }
 
 @end
+
+@interface UIResponder (Test)
+
+@end
+
+@implementation UIResponder (Test)
+
+
++ (void)load
+{
+  SwizzleInstanceMethod(self, @selector(canPerformAction:withSender:), @selector(swizzled_canPerformAction:withSender:));
+}
+- (BOOL)swizzled_canPerformAction:(SEL)action withSender:(id)sender
+{
+  return [self swizzled_canPerformAction:action withSender:sender];
+}
+@end

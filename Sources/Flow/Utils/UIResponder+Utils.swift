@@ -24,6 +24,7 @@ extension UIResponder {
     return nil
   }
   
+  @objc
   public final func responderChain() -> [UIResponder] {
     var chain: [UIResponder] = []
     
