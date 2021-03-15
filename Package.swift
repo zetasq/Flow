@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.3
 
 import PackageDescription
 
@@ -23,7 +23,10 @@ let package = Package(
     ),
     .target(
       name: "Flow",
-      dependencies: ["FlowObjC", "Concrete"]
+      dependencies: ["FlowObjC", "Concrete"],
+			exclude: [
+				"Documentation/"
+			]
     ),
     .testTarget(
       name: "FlowTests",
