@@ -34,7 +34,6 @@ public protocol DemoInlineEditableMenuViewEditActionHandling {
 public final class DemoInlineEditableMenuView: UIView {
   
   // MARK: - Properties
-  private var isInEditMode = false
   
   private let contentView = UIView()
   
@@ -67,7 +66,6 @@ public final class DemoInlineEditableMenuView: UIView {
     let success = super.becomeFirstResponder()
     
     if success {
-      isInEditMode = true
       updateContentView(animated: true)
     }
     
@@ -78,11 +76,20 @@ public final class DemoInlineEditableMenuView: UIView {
     let success = super.resignFirstResponder()
     
     if success {
-      isInEditMode = false
       updateContentView(animated: true)
     }
     
     return success
+  }
+  
+  private var _inputView: UIView?
+  public override var inputView: UIView? {
+    get {
+      return _inputView
+    }
+    set {
+      _inputView = newValue
+    }
   }
   
   // MARK: - Action handlers
@@ -118,7 +125,7 @@ public final class DemoInlineEditableMenuView: UIView {
   private func updateContentView(animated: Bool) {
     let changeBlock: () -> Void
     
-    if isInEditMode {
+    if self.isFirstResponder {
       changeBlock = { self.contentView.backgroundColor = .blue }
     } else {
       changeBlock = { self.contentView.backgroundColor = .gray }
