@@ -5,6 +5,8 @@
 //  Created by Zhu Shengqi on 2019/7/30.
 //
 
+#if os(iOS)
+
 import UIKit
 
 open class PageViewController: UIViewController {
@@ -509,3 +511,5 @@ extension PageViewController: UIScrollViewDelegate {
   }
   
 }
+
+#endif

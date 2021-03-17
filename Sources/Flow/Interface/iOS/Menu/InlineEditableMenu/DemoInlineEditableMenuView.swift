@@ -5,6 +5,8 @@
 //  Created by Zhu Shengqi on 2019/12/19.
 //
 
+#if os(iOS)
+
 import Foundation
 import UIKit
 
@@ -154,5 +156,7 @@ extension DemoInlineEditableMenuView: DemoInlineEditableMenuViewEditActions {
   }
   
 }
+
+#endif
 
 #endif

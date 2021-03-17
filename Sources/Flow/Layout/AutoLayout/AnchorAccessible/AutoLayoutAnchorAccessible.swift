@@ -6,7 +6,12 @@
 //
 
 import Foundation
+
+#if os(iOS)
 import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
 public protocol AutoLayoutAnchorAccessible {
   
@@ -36,9 +41,9 @@ public protocol AutoLayoutAnchorAccessible {
   
 }
 
-extension UIView: AutoLayoutAnchorAccessible {}
+extension PlatformAgnosticView: AutoLayoutAnchorAccessible {}
 
-extension UILayoutGuide: AutoLayoutAnchorAccessible {
+extension PlatformAgnosticLayoutGuide: AutoLayoutAnchorAccessible {
   
   public var lastBaselineAnchor: NSLayoutYAxisAnchor {
     fatalError("lastBaselineAnchor is not supported in \(type(of: self))")

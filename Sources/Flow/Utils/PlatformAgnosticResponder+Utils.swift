@@ -6,32 +6,31 @@
 //
 
 import Foundation
-import UIKit
 
-extension UIResponder {
+extension PlatformAgnosticResponder {
   
   public final func searchResponderChain<T>(ofType type: T.Type) -> T? {
-    var searchingResponder: UIResponder? = self
+    var searchingResponder: PlatformAgnosticResponder? = self
     
     while let currentResponder = searchingResponder {
       if let castedObject = currentResponder as? T {
         return castedObject
       }
       
-      searchingResponder = searchingResponder?.next
+      searchingResponder = searchingResponder?.nextPlatformAgnosticResponder
     }
     
     return nil
   }
   
-  public final func responderChain() -> [UIResponder] {
-    var chain: [UIResponder] = []
+  public final func responderChain() -> [PlatformAgnosticResponder] {
+    var chain: [PlatformAgnosticResponder] = []
     
-    var traveller: UIResponder? = self
+    var traveller: PlatformAgnosticResponder? = self
     
     while let responder = traveller {
       chain.append(responder)
-      traveller = traveller?.next
+      traveller = traveller?.nextPlatformAgnosticResponder
     }
     
     return chain

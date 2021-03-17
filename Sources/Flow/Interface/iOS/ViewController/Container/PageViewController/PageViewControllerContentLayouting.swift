@@ -5,6 +5,8 @@
 //  Created by Zhu Shengqi on 2019/8/6.
 //
 
+#if os(iOS)
+
 import Foundation
 import UIKit
 
@@ -24,4 +26,4 @@ public protocol PageViewControllerContentLayouting {
   
 }
 
-
+#endif

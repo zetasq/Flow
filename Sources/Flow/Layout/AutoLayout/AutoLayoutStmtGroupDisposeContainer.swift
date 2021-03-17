@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import UIKit
 
 public protocol AutoLayoutStmtGroupDisposeContainer: AnyObject {
   
@@ -14,13 +13,13 @@ public protocol AutoLayoutStmtGroupDisposeContainer: AnyObject {
   
 }
 
-extension UIView: AutoLayoutStmtGroupDisposeContainer {
+extension PlatformAgnosticView: AutoLayoutStmtGroupDisposeContainer {
   
   private static var associatedGroupKey = "associatedGroupKey"
   
   private var associatedGroup: AutoLayoutStmtGroup? {
     get {
-      if let existingGroup = objc_getAssociatedObject(self, &UIView.associatedGroupKey) as? AutoLayoutStmtGroup {
+      if let existingGroup = objc_getAssociatedObject(self, &PlatformAgnosticView.associatedGroupKey) as? AutoLayoutStmtGroup {
         return existingGroup
       } else {
         return nil
@@ -28,7 +27,7 @@ extension UIView: AutoLayoutStmtGroupDisposeContainer {
     }
     
     set {
-      objc_setAssociatedObject(self, &UIView.associatedGroupKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+      objc_setAssociatedObject(self, &PlatformAgnosticView.associatedGroupKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
   }
   

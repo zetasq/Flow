@@ -5,6 +5,8 @@
 //  Created by Zhu Shengqi on 2020/12/28.
 //
 
+#if os(iOS)
+
 import Foundation
 import UIKit
 
@@ -128,5 +130,7 @@ public final class DemoCustomContentField: UIControl {
     }
   }
 }
+
+#endif
 
 #endif

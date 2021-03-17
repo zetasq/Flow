@@ -6,7 +6,12 @@
 //
 
 import Foundation
+
+#if os(iOS)
 import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
 public func <=(_ lhs: DimensionAutoLayoutExpr, _ rhs: CGFloat) -> AutoLayoutStmt {
   let parsedConstraint: NSLayoutConstraint

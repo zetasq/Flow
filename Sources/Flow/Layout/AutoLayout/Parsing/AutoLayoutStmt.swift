@@ -6,7 +6,12 @@
 //
 
 import Foundation
+
+#if os(iOS)
 import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
 public struct AutoLayoutStmt {
   
@@ -16,7 +21,7 @@ public struct AutoLayoutStmt {
     self._constraint = constraint
   }
   
-  public func priority(_ priority: UILayoutPriority) -> Self {
+  public func priority(_ priority: PlatformAgnosticLayoutPriority) -> Self {
     self._constraint.priority = priority
     return self
   }

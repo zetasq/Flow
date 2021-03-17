@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Concrete
 
 internal final class _StyleScopeTable {
   
@@ -35,9 +34,8 @@ private var boundScopeTableKey = "boundScopeTableKey"
 extension Stylable {
   
   public func withStyleScope(named scopeName: String, @StyleRulesBuilder _ block: () -> [AbstractStyleRule]) {
-    // There is no + (void)load method in Swift, so we use the once token pattern here to do the logic injection into UIKit.
-    _ = UIKitStyleAutomationOnceToken
-    
+		assert(DebugStyleAutomationSetupFlag, "Style automation is not set up.")
+
     let scopeTable: _StyleScopeTable
     
     if let existingTable = objc_getAssociatedObject(self, &boundScopeTableKey) as? _StyleScopeTable {

@@ -7,6 +7,12 @@
 
 import Foundation
 
+#if os(iOS)
+import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
+
 public func <=(_ lhs: YAxisAutoLayoutExpr, _ rhs: YAxisAutoLayoutExpr) -> AutoLayoutStmt {
   guard lhs.multiplier == 1 && rhs.multiplier == 1 else {
     fatalError("Multipliers must be 1 when writing \(type(of: lhs)) statement")

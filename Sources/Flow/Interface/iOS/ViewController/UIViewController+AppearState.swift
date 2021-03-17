@@ -5,6 +5,8 @@
 //  Created by Zhu Shengqi on 2019/12/4.
 //
 
+#if os(iOS)
+
 import Foundation
 import UIKit
 
@@ -37,3 +39,5 @@ extension UIViewController {
   }
   
 }
+
+#endif

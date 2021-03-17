@@ -5,6 +5,8 @@
 //  Created by Zhu Shengqi on 2019/12/5.
 //
 
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+
 #import "UIView+Swizzle.h"
 
 @import ConcreteObjC;
@@ -37,3 +39,5 @@ static NSMutableArray<void (^)(UIView *)> *sViewDidMoveToWindowHandlers;
 }
 
 @end
+
+#endif
