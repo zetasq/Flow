@@ -17,5 +17,5 @@ public struct AutoLayoutBuilder {
   public static func buildBlock(_ stmt: AutoLayoutStmt) -> AutoLayoutStmtGroup {
     return AutoLayoutStmtGroup(stmts: [stmt])
   }
-  
+
 }
