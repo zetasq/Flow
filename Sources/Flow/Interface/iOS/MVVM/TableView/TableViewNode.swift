@@ -418,7 +418,6 @@ extension TableViewNode: TableViewSectionDelegate {
         updateBlock()
       }
     }
-
   }
   
   public func tableViewSection(_ section: TableViewSection,

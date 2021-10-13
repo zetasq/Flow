@@ -15,8 +15,12 @@ public protocol CollectionViewSectionDelegate: AnyObject {
                              requestInsertingAtIndices itemIndices: [Int],
                              dataChange: @escaping () -> Void,
                              animated: Bool)
-  
+
   // MARK: - Reload
+  func collectionViewSection(_ section: CollectionViewSection,
+                        requestReloadingWholeSectionWithChange dataChange: @escaping () -> Void,
+                        animated: Bool)
+
   func collectionViewSection(_ section: CollectionViewSection,
                              requestUpdatingSupplementaryViewsWithChange dataChange: @escaping () -> Void,
                              animated: Bool)

@@ -366,6 +366,29 @@ public final class CollectionViewNode<CollectionViewType: UICollectionView, Layo
 
 // MARK: - CollectionViewSectionDelegate
 extension CollectionViewNode: CollectionViewSectionDelegate {
+  public func collectionViewSection(_ section: CollectionViewSection,
+                                    requestReloadingWholeSectionWithChange dataChange: @escaping () -> Void,
+                                    animated: Bool) {
+    let updateBlock = {
+      self.collectionView.performBatchUpdates({
+        guard let sectionIndex = self.viewModelSections.firstIndex(where: { $0 === section }) else {
+          fatalError("Cannot find section:\(section) before reloading section")
+        }
+
+        dataChange()
+
+        self.collectionView.reloadSections(IndexSet(integer: sectionIndex))
+      }, completion: nil)
+    }
+
+    if animated {
+      updateBlock()
+    } else {
+      UIView.performWithoutAnimation {
+        updateBlock()
+      }
+    }
+  }
   
   public func collectionViewSection(_ section: CollectionViewSection, requestInsertingAtIndices itemIndices: [Int], dataChange: @escaping () -> Void, animated: Bool) {
     let updateBlock = {

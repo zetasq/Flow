@@ -28,6 +28,26 @@ open class CollectionViewSection {
   open func collectionViewTraitsDidChange(_ collectionViewTraits: CollectionViewTraits) {}
   
   // MARK: - Cell Models
+  public func replaceWithViewModels(_ newViewModels: [CollectionViewCellModelProtocol], animated: Bool) {
+    let change = {
+      for viewModel in self.viewModels {
+        viewModel.boundCollectionViewSection = nil
+      }
+
+      for viewModel in newViewModels {
+        viewModel.boundCollectionViewSection = self
+      }
+
+      self.viewModels = newViewModels
+    }
+
+    if let delegate = delegate {
+      delegate.collectionViewSection(self, requestReloadingWholeSectionWithChange: change, animated: animated)
+    } else {
+      change()
+    }
+  }
+
   public final func addViewModels(_ newViewModels: [CollectionViewCellModelProtocol], animated: Bool) {
     let change = {
       for viewModel in newViewModels {
