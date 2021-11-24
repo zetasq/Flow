@@ -6,6 +6,8 @@
 //  Copyright © 2018 Zhu Shengqi. All rights reserved.
 //
 
+#if os(iOS)
+
 import Foundation
 
 open class CollectionViewSection {
@@ -96,3 +98,5 @@ open class CollectionViewSection {
   }
 
 }
+
+#endif

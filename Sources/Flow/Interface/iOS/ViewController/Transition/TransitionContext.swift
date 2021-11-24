@@ -6,6 +6,8 @@
 //  Copyright © 2017 Zhu Shengqi. All rights reserved.
 //
 
+#if os(iOS)
+
 import UIKit
 
 extension UIViewController {
@@ -50,3 +52,4 @@ public class TransitionContext: NSObject {
 
 extension TransitionContext: UIViewControllerTransitioningDelegate {}
 
+#endif

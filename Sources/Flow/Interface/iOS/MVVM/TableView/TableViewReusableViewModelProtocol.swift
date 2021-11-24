@@ -6,6 +6,8 @@
 //  Copyright © 2018 Zhu Shengqi. All rights reserved.
 //
 
+#if os(iOS)
+
 import Foundation
 import Concrete
 
@@ -35,3 +37,5 @@ extension TableViewReusableViewModelProtocol {
   }
   
 }
+
+#endif

@@ -6,6 +6,8 @@
 //  Copyright © 2017 Zhu Shengqi. All rights reserved.
 //
 
+#if os(iOS)
+
 import UIKit
 
 final class CenterMenuTransitionContext: TransitionContext {
@@ -31,3 +33,5 @@ final class CenterMenuTransitionContext: TransitionContext {
     return controller
   }
 }
+
+#endif

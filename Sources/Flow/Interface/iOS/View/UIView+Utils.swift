@@ -6,6 +6,8 @@
 //  Copyright © 2018 Zhu Shengqi. All rights reserved.
 //
 
+#if os(iOS)
+
 import UIKit
 
 extension UIView {
@@ -34,3 +36,5 @@ extension UIView {
   }
   
 }
+
+#endif

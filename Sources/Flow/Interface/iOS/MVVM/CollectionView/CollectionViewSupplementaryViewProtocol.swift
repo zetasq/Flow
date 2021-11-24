@@ -6,8 +6,12 @@
 //  Copyright © 2018 Zhu Shengqi. All rights reserved.
 //
 
+#if os(iOS)
+
 import Foundation
 
 public protocol CollectionViewSupplementaryViewProtocol: CollectionViewReusableViewProtocol & CollectionViewSupplementaryViewSizingProtocol where ViewModel: CollectionViewSupplementaryViewModelProtocol {
   
 }
+
+#endif

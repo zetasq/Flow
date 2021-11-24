@@ -6,6 +6,8 @@
 //  Copyright © 2018 Zhu Shengqi. All rights reserved.
 //
 
+#if os(iOS)
+
 import Foundation
 
 public protocol ViewModelViewMappable: AnyObject {}
@@ -33,3 +35,5 @@ extension ViewModelViewMappable {
   }
   
 }
+
+#endif

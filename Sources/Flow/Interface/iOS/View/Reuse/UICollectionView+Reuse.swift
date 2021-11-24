@@ -6,6 +6,8 @@
 //  Copyright © 2017 Zhu Shengqi. All rights reserved.
 //
 
+#if os(iOS)
+
 import UIKit
 
 extension UICollectionReusableView: Reusable {}
@@ -37,3 +39,5 @@ public extension UICollectionView {
     return dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: (type as! UICollectionReusableView.Type).reuseIdentifier, for: indexPath)
   }
 }
+
+#endif

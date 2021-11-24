@@ -6,6 +6,8 @@
 //  Copyright © 2017 Zhu Shengqi. All rights reserved.
 //
 
+#if os(iOS)
+
 import UIKit
 
 extension UITableViewCell: Reusable {}
@@ -38,3 +40,5 @@ public extension UITableView {
     return dequeueReusableHeaderFooterView(withIdentifier: (type as! UITableViewHeaderFooterView.Type).reuseIdentifier)!
   }
 }
+
+#endif

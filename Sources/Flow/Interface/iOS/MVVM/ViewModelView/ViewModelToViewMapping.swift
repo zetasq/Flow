@@ -6,6 +6,8 @@
 //  Copyright © 2018 Zhu Shengqi. All rights reserved.
 //
 
+#if os(iOS)
+
 import Foundation
 
 internal final class ViewModelToViewMapping {
@@ -23,3 +25,5 @@ internal final class ViewModelToViewMapping {
   }
   
 }
+
+#endif

@@ -6,6 +6,8 @@
 //  Copyright © 2018 Zhu Shengqi. All rights reserved.
 //
 
+#if os(iOS)
+
 import UIKit
 
 open class DynamicCollectionView: UICollectionView {
@@ -22,3 +24,5 @@ open class DynamicCollectionView: UICollectionView {
     return self.contentSize
   }
 }
+
+#endif

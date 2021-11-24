@@ -6,6 +6,8 @@
 //  Copyright © 2017 Zhu Shengqi. All rights reserved.
 //
 
+#if os(iOS)
+
 import UIKit
 
 extension SideMenuTransitionContext {
@@ -90,3 +92,4 @@ extension SideMenuTransitionContext {
   }
 }
 
+#endif

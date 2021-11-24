@@ -6,6 +6,8 @@
 //  Copyright © 2018 Zhu Shengqi. All rights reserved.
 //
 
+#if os(iOS)
+
 import Foundation
 
 public protocol CollectionViewSectionDelegate: AnyObject {
@@ -25,3 +27,5 @@ public protocol CollectionViewSectionDelegate: AnyObject {
                              requestUpdatingSupplementaryViewsWithChange dataChange: @escaping () -> Void,
                              animated: Bool)
 }
+
+#endif

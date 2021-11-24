@@ -6,8 +6,12 @@
 //  Copyright © 2018 Zhu Shengqi. All rights reserved.
 //
 
+#if os(iOS)
+
 import UIKit
 
 public protocol TableViewCellProtocol: UITableViewCell & ViewModelViewProtocol & TableViewReusableViewSizingProtocol where ViewModel: TableViewCellModelProtocol {
   
 }
+
+#endif

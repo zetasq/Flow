@@ -6,6 +6,8 @@
 //  Copyright © 2017 Zhu Shengqi. All rights reserved.
 //
 
+#if os(iOS)
+
 import UIKit
 
 public final class SideMenuTransitionContext: TransitionContext {
@@ -74,3 +76,5 @@ extension SideMenuTransitionContext: SideMenuPresentationControllerDelegate {
     interactiveAnimator.config(with: presentedViewController)
   }
 }
+
+#endif
