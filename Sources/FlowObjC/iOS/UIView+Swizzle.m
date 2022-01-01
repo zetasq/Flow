@@ -5,6 +5,8 @@
 //  Created by Zhu Shengqi on 2019/12/5.
 //
 
+#include <TargetConditionals.h>
+
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 
 #import "UIView+Swizzle.h"
