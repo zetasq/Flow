@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.6
 
 import PackageDescription
 
@@ -14,7 +14,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/zetasq/Concrete.git", .branch("master"))
+    .package(url: "https://github.com/zetasq/Concrete.git", branch: "main")
   ],
   targets: [
     .target(

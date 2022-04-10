@@ -1,16 +1,14 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "Concrete",
-        "repositoryURL": "https://github.com/zetasq/Concrete.git",
-        "state": {
-          "branch": "master",
-          "revision": "5a51ae16cad5cbfbebe24272d6b4ae4be942864e",
-          "version": null
-        }
+  "pins" : [
+    {
+      "identity" : "concrete",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/zetasq/Concrete.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "f40d6c93e15dcb30ee0632fe6cfb9ceba625e8f9"
       }
-    ]
-  },
-  "version": 1
+    }
+  ],
+  "version" : 2
 }
