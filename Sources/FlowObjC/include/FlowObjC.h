@@ -6,3 +6,4 @@
 //
 
 #import "../iOS/UIView+Swizzle.h"
+#import "../macOS/NSWindowController+Swizzle.h"
