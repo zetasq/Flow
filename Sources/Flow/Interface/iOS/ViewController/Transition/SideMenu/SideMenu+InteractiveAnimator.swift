@@ -87,6 +87,8 @@ extension SideMenuTransitionContext {
         viewController.transitionContext?.shouldDismissWithInteraction = false
 
         cancel()
+      @unknown default:
+        fatalError()
       }
     }
   }

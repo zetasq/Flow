@@ -10,7 +10,7 @@
 
 import UIKit
 
-protocol SideMenuPresentationControllerDelegate: class {
+protocol SideMenuPresentationControllerDelegate: AnyObject {
   func presentationDidFinish(_ presentedViewController: UIViewController)
 }
 
@@ -122,6 +122,8 @@ extension SideMenuTransitionContext {
         newSize = CGSize(width: floor(parentView.bounds.width * proportionInCompactWidth), height: parentView.bounds.height)
       case .regular, .unspecified:
         newSize =  CGSize(width: floor(parentView.bounds.width * proportionInRegularWidth), height: parentView.bounds.height)
+      @unknown default:
+        fatalError()
       }
       
       var newOrigin: CGPoint

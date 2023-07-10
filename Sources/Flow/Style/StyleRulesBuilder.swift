@@ -7,7 +7,7 @@
 
 import Foundation
 
-@_functionBuilder
+@resultBuilder
 public struct StyleRulesBuilder {
   
   public static func buildBlock(_ rules: AbstractStyleRule...) -> [AbstractStyleRule] {

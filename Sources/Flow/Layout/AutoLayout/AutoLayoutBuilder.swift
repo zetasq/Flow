@@ -7,7 +7,7 @@
 
 import Foundation
 
-@_functionBuilder
+@resultBuilder
 public struct AutoLayoutBuilder {
   
   public static func buildBlock(_ stmts: AutoLayoutStmt...) -> AutoLayoutStmtGroup {
