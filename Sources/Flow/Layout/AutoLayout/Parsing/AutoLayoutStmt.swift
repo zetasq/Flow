@@ -26,7 +26,7 @@ public struct AutoLayoutStmt {
     return self
   }
   
-  public func assignConstraint(_ constraint: inout NSLayoutConstraint?) -> Self {
+  public func store(in constraint: inout NSLayoutConstraint?) -> Self {
     constraint = self._constraint
     return self
   }
