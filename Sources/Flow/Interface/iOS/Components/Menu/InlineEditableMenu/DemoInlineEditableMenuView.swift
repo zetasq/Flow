@@ -12,18 +12,7 @@ import UIKit
 
 #if DEBUG
 
-@objc
 @MainActor
-private protocol DemoInlineEditableMenuViewEditActions {
-  
-  func demoInlineEditableMenuViewEditActionA(_ sender: Any)
-  
-  func demoInlineEditableMenuViewEditActionB(_ sender: Any)
-  
-  func demoInlineEditableMenuViewEditActionC(_ sender: Any)
-  
-}
-
 public protocol DemoInlineEditableMenuViewEditActionHandling {
   
   func demoInlineEditableMenuViewDidPerformEditActionA(_ menuView: DemoInlineEditableMenuView)
@@ -48,115 +37,85 @@ public final class DemoInlineEditableMenuView: UIView {
     contentView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     self.addSubview(contentView)
     
-    updateContentView(animated: false)
+    editMenuInteraction = UIEditMenuInteraction(delegate: self)
+    contentView.addInteraction(editMenuInteraction!)
     
-    let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(self.longPressGestureRecognized(_:)))
-    contentView.addGestureRecognizer(longPressGestureRecognizer)
+    // Create the gesture recognizer.
+    let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPressGestureRecognized(_:)))
+    longPress.allowedTouchTypes = [UITouch.TouchType.direct.rawValue as NSNumber]
+    contentView.addGestureRecognizer(longPress)
     
-    NotificationCenter.default.addObserver(self, selector: #selector(self.menuControllerWillHideMenu(_:)), name: UIMenuController.willHideMenuNotification, object: nil)
+    updateContentViewForEditMenuStatus()
   }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
+
+  private var editMenuInteraction: UIEditMenuInteraction?
   
-  // MARK: - UIResponder overrides
-  public override var canBecomeFirstResponder: Bool {
-    return true
+  private var isShowingEditMenu = false {
+    didSet {
+      updateContentViewForEditMenuStatus()
+    }
   }
   
-  public override func becomeFirstResponder() -> Bool {
-    let success = super.becomeFirstResponder()
-    
-    if success {
-      updateContentView(animated: true)
-    }
-    
-    return success
-  }
-  
-  public override func resignFirstResponder() -> Bool {
-    let success = super.resignFirstResponder()
-    
-    if success {
-      updateContentView(animated: true)
-    }
-    
-    return success
-  }
-  
-  private var _inputView: UIView?
-  public override var inputView: UIView? {
-    get {
-      return _inputView
-    }
-    set {
-      _inputView = newValue
+  private func updateContentViewForEditMenuStatus() {
+    if isShowingEditMenu {
+      contentView.backgroundColor = .blue
+    } else {
+      contentView.backgroundColor = .gray
     }
   }
   
   // MARK: - Action handlers
   @objc
   private func longPressGestureRecognized(_ recognizer: UILongPressGestureRecognizer) {
-    guard self.becomeFirstResponder() else {
-      return
-    }
+    guard recognizer.state == .began else { return }
     
-    UIMenuController.shared.menuItems = [
-      UIMenuItem(title: "Action A", action: #selector(DemoInlineEditableMenuViewEditActions.demoInlineEditableMenuViewEditActionA(_:))),
-      UIMenuItem(title: "Action B", action: #selector(DemoInlineEditableMenuViewEditActions.demoInlineEditableMenuViewEditActionB(_:))),
-      UIMenuItem(title: "Action C", action: #selector(DemoInlineEditableMenuViewEditActions.demoInlineEditableMenuViewEditActionC(_:))),
-    ]
+    let location = recognizer.location(in: self.contentView)
+    let configuration = UIEditMenuConfiguration(identifier: nil, sourcePoint: location)
     
-    UIMenuController.shared.showMenu(from: self.contentView, rect: self.contentView.bounds)
-    
-    if !UIMenuController.shared.isMenuVisible {
-      // If no menu items is actually displayed, resign first responder.
-      _ = self.resignFirstResponder()
-    }
-  }
-  
-  // MARK: - Notification handlers
-  @objc
-  private func menuControllerWillHideMenu(_ notification: Notification) {
-    if self.isFirstResponder {
-      _ = self.resignFirstResponder()
-    }
-  }
-  
-  // MARK: - Helper methods
-  private func updateContentView(animated: Bool) {
-    let changeBlock: () -> Void
-    
-    if self.isFirstResponder {
-      changeBlock = { self.contentView.backgroundColor = .blue }
-    } else {
-      changeBlock = { self.contentView.backgroundColor = .gray }
-    }
-    
-    if animated {
-      UIView.animate(withDuration: 0.25, delay: 0, options: .beginFromCurrentState, animations: changeBlock, completion: nil)
-    } else {
-      changeBlock()
+    if let interaction = editMenuInteraction {
+      interaction.presentEditMenu(with: configuration)
     }
   }
 }
 
-extension DemoInlineEditableMenuView: DemoInlineEditableMenuViewEditActions {
-  
-  public func demoInlineEditableMenuViewEditActionA(_ sender: Any) {
-    self.searchResponderChain(ofType: DemoInlineEditableMenuViewEditActionHandling.self)?.demoInlineEditableMenuViewDidPerformEditActionA(self)
+extension DemoInlineEditableMenuView: @MainActor UIEditMenuInteractionDelegate {
+  public func editMenuInteraction(_ interaction: UIEditMenuInteraction, menuFor configuration: UIEditMenuConfiguration, suggestedActions: [UIMenuElement]) -> UIMenu? {
+    let additionalActions: [UIMenuElement] = [
+      UIAction(title: "Action A", handler: { [weak self] action in
+        guard let self else { return }
+        
+        self.searchResponderChain(ofType: DemoInlineEditableMenuViewEditActionHandling.self)?.demoInlineEditableMenuViewDidPerformEditActionA(self)
+      }),
+      UIAction(title: "Action B", handler: { [weak self] action in
+        guard let self else { return }
+        
+        self.searchResponderChain(ofType: DemoInlineEditableMenuViewEditActionHandling.self)?.demoInlineEditableMenuViewDidPerformEditActionB(self)
+      }),
+      UIAction(title: "Action C", handler: { [weak self] action in
+        guard let self else { return }
+        
+        self.searchResponderChain(ofType: DemoInlineEditableMenuViewEditActionHandling.self)?.demoInlineEditableMenuViewDidPerformEditActionC(self)
+      })
+    ]
+    
+    return UIMenu(children: suggestedActions + additionalActions)
   }
   
-  public func demoInlineEditableMenuViewEditActionB(_ sender: Any) {
-    self.searchResponderChain(ofType: DemoInlineEditableMenuViewEditActionHandling.self)?.demoInlineEditableMenuViewDidPerformEditActionB(self)
+  public func editMenuInteraction(_ interaction: UIEditMenuInteraction, willPresentMenuFor configuration: UIEditMenuConfiguration, animator: any UIEditMenuInteractionAnimating) {
+    animator.addAnimations {
+      self.isShowingEditMenu = true
+    }
   }
   
-  public func demoInlineEditableMenuViewEditActionC(_ sender: Any) {
-    self.searchResponderChain(ofType: DemoInlineEditableMenuViewEditActionHandling.self)?.demoInlineEditableMenuViewDidPerformEditActionC(self)
+  public func editMenuInteraction(_ interaction: UIEditMenuInteraction, willDismissMenuFor configuration: UIEditMenuConfiguration, animator: any UIEditMenuInteractionAnimating) {
+    self.isShowingEditMenu = false
   }
-  
 }
+
 
 #endif
 
