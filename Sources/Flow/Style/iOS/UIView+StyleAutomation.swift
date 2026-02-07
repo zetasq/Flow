@@ -12,7 +12,7 @@ import UIKit
 import FlowObjC
 
 extension UIView {
-	public final func setupStyleAutomation() {
+	public static func setupStyleAutomation() {
 		UIView.flow_addViewDidMoveToWindowHandler { view in
 			view.applyStyleRules()
 		}
