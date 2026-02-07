@@ -26,19 +26,39 @@ public final class DemoInputView: UIInputView {
       contentView.anchor.leading == self.anchor.leading
       contentView.anchor.bottom == self.anchor.bottom
       contentView.anchor.trailing == self.anchor.trailing
-//      (contentView.anchor.height == 200).priority(.defaultHigh)
+      (contentView.anchor.height == 200).priority(.defaultHigh).store(in: &heightConstraint)
     }
     
     self.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     self.allowsSelfSizing = true
+    
+    let button = UIButton(type: .system)
+    button.setTitle("Change height", for: .normal)
+    button.addTarget(self, action: #selector(heightButtonTapped(sender:)), for: .primaryActionTriggered)
+    button.translatesAutoresizingMaskIntoConstraints = false
+    
+    contentView.addSubview(button)
+    AutoLayout {
+      button.anchor.centerX == contentView.anchor.centerX
+      button.anchor.centerY == contentView.anchor.centerY
+    }
   }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   
-  public override func systemLayoutSizeFitting(_ targetSize: CGSize) -> CGSize {
-    return CGSize(width: targetSize.width, height: 150)
+  private var heightConstraint: NSLayoutConstraint?
+  
+  @objc
+  private func heightButtonTapped(sender: Any) {
+    UIView.animate(withDuration: 0.25, delay: 0, options: .flushUpdates) {
+      if self.heightConstraint?.constant == 200 {
+        self.heightConstraint?.constant = 100
+      } else {
+        self.heightConstraint?.constant = 200
+      }
+    }
   }
 }
 
@@ -101,6 +121,8 @@ public final class DemoCustomContentField: UIControl {
   }
   
   public override func endTracking(_ touch: UITouch?, with event: UIEvent?) {
+    super.endTracking(touch, with: event)
+    
     guard let touch = touch else { return }
     
     let touchLocation = touch.location(in: self)
