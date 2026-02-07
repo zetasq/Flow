@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 public struct AutoLayoutAnchorAccessibleBox<Accessible: AutoLayoutAnchorAccessible> {
   
   internal let accessible: Accessible

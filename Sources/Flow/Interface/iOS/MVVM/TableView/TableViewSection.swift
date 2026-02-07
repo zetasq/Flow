@@ -11,6 +11,7 @@
 import Foundation
 import UIKit
 
+@MainActor
 public final class TableViewSection {
   
   // MARK: - Properties

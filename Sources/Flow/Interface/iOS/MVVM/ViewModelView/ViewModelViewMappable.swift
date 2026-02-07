@@ -10,9 +10,11 @@
 
 import Foundation
 
+@MainActor
 public protocol ViewModelViewMappable: AnyObject {}
 
-private var viewModelToViewMappingKey = "com.zetasq.Arsenal.viewModelToViewMappingKey"
+@MainActor
+private var viewModelToViewMappingKey: Void?
 
 extension ViewModelViewMappable {
   

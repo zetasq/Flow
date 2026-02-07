@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 public class AbstractStyleRule {
   
   public let elementType: Stylable.Type
@@ -25,6 +26,7 @@ public class AbstractStyleRule {
   
 }
 
+@MainActor
 public final class StyleRule<StylableElement: Stylable>: AbstractStyleRule {
   
   public let selector: StyleSelector<StylableElement>

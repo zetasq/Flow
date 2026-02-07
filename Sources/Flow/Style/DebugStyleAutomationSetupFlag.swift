@@ -8,5 +8,8 @@
 import Foundation
 
 #if DEBUG
+
+@MainActor
 internal var DebugStyleAutomationSetupFlag = false
+
 #endif

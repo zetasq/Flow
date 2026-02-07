@@ -10,6 +10,7 @@
 import Foundation
 import UIKit
 
+@MainActor
 public protocol TableViewSectionDelegate: AnyObject {
   
   func tableViewSection(_ section: TableViewSection,

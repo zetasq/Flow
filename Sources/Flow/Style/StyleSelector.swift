@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 public struct StyleSelector<TargetElement: Stylable> {
   
   public var targetCategory: StyleSemanticCategory?

@@ -13,6 +13,7 @@ import UIKit
 import AppKit
 #endif
 
+@MainActor
 public protocol AutoLayoutAnchorAccessible {
   
   var topAnchor: NSLayoutYAxisAnchor { get }

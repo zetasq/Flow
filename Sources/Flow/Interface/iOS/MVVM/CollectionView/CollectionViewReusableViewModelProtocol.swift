@@ -11,10 +11,11 @@
 import Foundation
 import Concrete
 
+@MainActor
 public protocol CollectionViewReusableViewModelProtocol: AnyObject {}
 
-
-private var boundCollectionViewSectionKey = "com.zetasq.Arsenal.boundCollectionViewSectionKey"
+@MainActor
+private var boundCollectionViewSectionKey: Void?
 
 extension CollectionViewReusableViewModelProtocol {
   

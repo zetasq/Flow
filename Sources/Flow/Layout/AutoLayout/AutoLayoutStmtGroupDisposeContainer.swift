@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 public protocol AutoLayoutStmtGroupDisposeContainer: AnyObject {
   
   func injectNewGroup(_ group: AutoLayoutStmtGroup)
@@ -15,7 +16,7 @@ public protocol AutoLayoutStmtGroupDisposeContainer: AnyObject {
 
 extension PlatformAgnosticView: AutoLayoutStmtGroupDisposeContainer {
   
-  private static var associatedGroupKey = "associatedGroupKey"
+  private static var associatedGroupKey: Void?
   
   private var associatedGroup: AutoLayoutStmtGroup? {
     get {

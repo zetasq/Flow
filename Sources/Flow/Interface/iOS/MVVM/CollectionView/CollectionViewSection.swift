@@ -10,6 +10,7 @@
 
 import Foundation
 
+@MainActor
 open class CollectionViewSection {
   
   // MARK: - Properties

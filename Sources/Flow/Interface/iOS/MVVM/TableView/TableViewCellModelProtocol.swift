@@ -31,17 +31,23 @@ public protocol TableViewCellModelProtocol: TableViewReusableViewModelProtocol {
   
 }
 
-private var tableViewCellModelSelectHandlerKey = "com.zetasq.Arsenal.tableViewCellModelSelectHandlerKey"
+@MainActor
+private var tableViewCellModelSelectHandlerKey: Void?
 
-private var tableViewCellModelAccessoryTapHandlerKey = "com.zetasq.Arsenal.tableViewCellModelAccessoryTapHandlerKey"
+@MainActor
+private var tableViewCellModelAccessoryTapHandlerKey: Void?
 
-private var tableViewCellModelEditingStyleCommittingHandlerKey = "com.zetasq.Arsenal.tableViewCellModelEditingStyleCommittingHandlerKey"
+@MainActor
+private var tableViewCellModelEditingStyleCommittingHandlerKey: Void?
 
-private var tableViewCellModelLeadingSwipeActionsConfigurationKey = "com.zetasq.Arsenal.tableViewCellModelLeadingSwipeActionsConfigurationKey"
+@MainActor
+private var tableViewCellModelLeadingSwipeActionsConfigurationKey: Void?
 
-private var tableViewCellModelTrailingSwipeActionsConfigurationKey = "com.zetasq.Arsenal.tableViewCellModelTrailingSwipeActionsConfigurationKey"
+@MainActor
+private var tableViewCellModelTrailingSwipeActionsConfigurationKey: Void?
 
-private var tableViewCellModelMenuActionHandlerKey = "com.zetasq.Arsenal.tableViewCellModelMenuActionHandlerKey"
+@MainActor
+private var tableViewCellModelMenuActionHandlerKey: Void?
 
 extension TableViewCellModelProtocol {
   

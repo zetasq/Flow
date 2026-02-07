@@ -13,6 +13,7 @@ import UIKit
 #if DEBUG
 
 @objc
+@MainActor
 private protocol DemoInlineEditableMenuViewEditActions {
   
   func demoInlineEditableMenuViewEditActionA(_ sender: Any)

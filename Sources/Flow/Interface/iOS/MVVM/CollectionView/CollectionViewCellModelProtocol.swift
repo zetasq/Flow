@@ -27,10 +27,13 @@ public protocol CollectionViewCellModelProtocol: CollectionViewReusableViewModel
   
 }
 
-private var collectionViewCellModelSelectHandlerKey = "com.zetasq.Arsenal.collectionViewCellModelSelectHandlerKey"
+@MainActor
+private var collectionViewCellModelSelectHandlerKey: Void?
 
-private var collectionViewCellModelMenuActionHandlerKey = "com.zetasq.Arsenal.collectionViewCellModelMenuActionHandlerKey"
+@MainActor
+private var collectionViewCellModelMenuActionHandlerKey: Void?
 
+@MainActor
 extension CollectionViewCellModelProtocol {
   
   // MARK: - Default protocol implementation

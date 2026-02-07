@@ -11,10 +11,11 @@
 import Foundation
 import Concrete
 
+@MainActor
 public protocol TableViewReusableViewModelProtocol: AnyObject {}
 
-
-private var boundTableViewSectionKey = "com.zetasq.Arsenal.boundTableViewSectionKey"
+@MainActor
+private var boundTableViewSectionKey: Void?
 
 extension TableViewReusableViewModelProtocol {
   

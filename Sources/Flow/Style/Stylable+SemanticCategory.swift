@@ -7,7 +7,8 @@
 
 import Foundation
 
-private var boundStyleSemanticCategoryKey = "boundStyleSemanticCategoryKey"
+@MainActor
+private var boundStyleSemanticCategoryKey: Void?
 
 extension Stylable {
   

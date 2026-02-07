@@ -10,6 +10,7 @@
 
 import UIKit
 
+@MainActor
 public final class SideMenuTransitionContext: TransitionContext {
   // MARK: - Subtypes
   public enum Side {

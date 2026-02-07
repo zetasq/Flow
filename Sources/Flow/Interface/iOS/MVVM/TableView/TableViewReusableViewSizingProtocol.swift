@@ -18,6 +18,7 @@ public enum TableViewReusableViewHeight {
   
 }
 
+@MainActor
 public protocol TableViewReusableViewSizingProtocol {
   
   static func tableViewReusableViewHeight(forTableViewBounds tableViewBounds: CGRect) -> TableViewReusableViewHeight

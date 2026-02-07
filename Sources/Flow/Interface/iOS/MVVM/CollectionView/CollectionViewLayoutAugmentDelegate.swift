@@ -10,6 +10,7 @@
 
 import UIKit
 
+@MainActor
 public protocol CollectionViewLayoutAugmentDelegate: AnyObject {
   
   func collectionViewLayoutDidPrepare(_ layout: UICollectionViewLayout)

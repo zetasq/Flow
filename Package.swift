@@ -1,11 +1,11 @@
-// swift-tools-version:5.6
+// swift-tools-version:6.2
 
 import PackageDescription
 
 let package = Package(
   name: "Flow",
   platforms: [
-		.iOS(.v13), .macOS(.v10_12)
+    .iOS(.v26), .macOS(.v26)
   ],
   products: [
     .library(

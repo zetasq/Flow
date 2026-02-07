@@ -29,7 +29,8 @@ internal final class _StyleScopeTable {
 }
 
 
-private var boundScopeTableKey = "boundScopeTableKey"
+@MainActor
+private var boundScopeTableKey: Void?
 
 extension Stylable {
   

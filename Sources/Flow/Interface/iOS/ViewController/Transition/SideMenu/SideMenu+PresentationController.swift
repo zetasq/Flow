@@ -10,6 +10,7 @@
 
 import UIKit
 
+@MainActor
 protocol SideMenuPresentationControllerDelegate: AnyObject {
   func presentationDidFinish(_ presentedViewController: UIViewController)
 }

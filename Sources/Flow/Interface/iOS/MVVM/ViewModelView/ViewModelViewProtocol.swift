@@ -11,6 +11,7 @@
 import Foundation
 import UIKit
 
+@MainActor
 public protocol ViewModelViewOverridenProtocol {
   
   func viewModelDidUpdate()

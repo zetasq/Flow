@@ -10,6 +10,7 @@
 
 import Foundation
 
+@MainActor
 public protocol CollectionViewSectionDelegate: AnyObject {
   
   // MARK: - Insert
